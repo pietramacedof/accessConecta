@@ -932,6 +932,7 @@ section.dark-mode .about-container h3 {
     justify-content: center;
     min-height: 700px;
     padding-top: 20px;
+    padding-bottom: 60px;
 }
 
 .location-info {
@@ -1052,11 +1053,16 @@ section.dark-mode .about-container h3 {
     
     .filter{
         padding-top: 10px;
-        width: 70%;
+        width: 67%;
         display: flex;
         justify-content: end;
         flex-direction: row;
         height: auto;
+    }
+    
+    .btn btn-secondary {
+        background-color: #4086F4;
+   		border-width: inherit;
     }
 
 

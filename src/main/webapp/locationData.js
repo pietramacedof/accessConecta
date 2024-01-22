@@ -34,11 +34,13 @@ $(document).ready(function() {
 		var target = this.hash;
 		var $target = $(target);
 
-		$('html, body').stop().delay(800).animate({
-			'scrollTop': $target.offset().top
-		}, 400, 'swing', function() {
-			window.location.hash = target;
-		});
+		if ($target && $target.length > 0) {
+			$('html, body').stop().delay(800).animate({
+				'scrollTop': $target.offset().top
+			}, 400, 'swing', function() {
+				window.location.hash = target;
+			});
+		}
 	});
 	$('#liveToastBtn').on('click', function(e) {
 		e.preventDefault();
@@ -456,6 +458,40 @@ function initMap(address, mapContainerId) {
 		}
 	});
 }
+
+$('#filterRestaurant').click(function() {
+	var locations = JSON.parse(localStorage.getItem('dataLocation'));
+	$.each(locations, function(index, location) {
+		if (location.type === 'restaurant') {
+            console.log('restaurante');
+            $('.location-info').eq(index).show();
+        } else {
+            $('.location-info').eq(index).hide();
+        }
+	});
+});
+
+$('#filterEvent').click(function() {
+	var locations = JSON.parse(localStorage.getItem('dataLocation'));
+	$.each(locations, function(index, location) {
+		if (location.type === 'event') {
+            $('.location-info').eq(index).show();
+        } else {
+            $('.location-info').eq(index).hide();
+        }
+	});
+});
+
+$('#filterStore').click(function() {
+	var locations = JSON.parse(localStorage.getItem('dataLocation'));
+	$.each(locations, function(index, location) {
+		if (location.type === 'store') {
+            $('.location-info').eq(index).show();
+        } else {
+            $('.location-info').eq(index).hide();
+        }
+	});
+});
 
 
 

@@ -1,24 +1,27 @@
-$(document).ready(function () {
+$(document).ready(function() {
 
-	$('a[href^="#"]').on('click', function (e) {
+	$('a[href^="#"]').on('click', function(e) {
 		e.preventDefault();
 		var target = this.hash;
 		var $target = $(target);
 
-		$('html, body').stop().delay(800).animate({
-			'scrollTop': $target.offset().top
-		}, 400, 'swing', function () {
-			window.location.hash = target;
-		});
+		if ($target && $target.length > 0) {
+			$('html, body').stop().delay(800).animate({
+				'scrollTop': $target.offset().top
+			}, 400, 'swing', function() {
+				window.location.hash = target;
+			});
+		}
 	});
-	$('#liveToastBtn').on('click', function (e) {
+	$('#liveToastBtn').on('click', function(e) {
 		e.preventDefault();
 		console.log("click")
 		$('#liveToast').toast('show');
 	})
 });
 
-document.addEventListener('DOMContentLoaded', function () {console.log("loads")
+document.addEventListener('DOMContentLoaded', function() {
+	console.log("loads")
 	const lightModeIcon = document.getElementById('lightModeIcon');
 	const darkModeIcon = document.getElementById('darkModeIcon');
 	const sections = document.querySelectorAll('section');
@@ -35,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function () {console.log("loads")
 	const ownerHeader = document.getElementById('owner-header-d');
 	const hasLocation = document.getElementById('hasLocation');
 	const locationInfo = document.getElementById('locationInfo');
-	lightModeIcon && lightModeIcon.addEventListener('click', function () {
+	lightModeIcon && lightModeIcon.addEventListener('click', function() {
 		console.log('Light Mode Clicked');
 		lightModeIcon.style.display = 'none';
 		darkModeIcon.style.display = 'block';
@@ -49,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function () {console.log("loads")
 		registerLocationModal && registerLocationModal.classList.remove('dark-mode');
 		locationInfo && locationInfo.classList.remove('dark-mode');
 		hasLocation && hasLocation.classList.remove('dark-mode');
-		sections.forEach(function (section) {
+		sections.forEach(function(section) {
 			section.classList.remove('dark-mode');
 		});
 		loginModal && loginModal.classList.remove('dark-mode');
@@ -58,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function () {console.log("loads")
 	});
 
 
-	darkModeIcon && darkModeIcon.addEventListener('click', function () {
+	darkModeIcon && darkModeIcon.addEventListener('click', function() {
 		console.log('Dark Mode Clicked');
 		lightModeIcon.style.display = 'block';
 		darkModeIcon.style.display = 'none';
@@ -72,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function () {console.log("loads")
 		registerLocationModal && registerLocationModal.classList.add('dark-mode');
 		hasLocation && hasLocation.classList.add('dark-mode');
 		locationInfo && locationInfo.classList.add('dark-mode');
-		sections.forEach(function (section) {
+		sections.forEach(function(section) {
 			section.classList.add('dark-mode');
 		});
 		loginModal && loginModal.classList.add('dark-mode');
@@ -81,28 +84,28 @@ document.addEventListener('DOMContentLoaded', function () {console.log("loads")
 	});
 });
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
 	// Botões e modal
 	const openModalBtn = document.getElementById('modalLogin');
 	const loginModal = document.getElementById('loginModal');
 	const close = document.getElementById('closeLogin');
 
 
-	openModalBtn && openModalBtn.addEventListener('click', function () {
+	openModalBtn && openModalBtn.addEventListener('click', function() {
 		loginModal.style.display = 'block';
 	});
 
-	close && close.addEventListener('click', function () {
+	close && close.addEventListener('click', function() {
 		loginModal.style.display = 'none';
 	});
 
-	window.addEventListener('click', function (event) {
+	window.addEventListener('click', function(event) {
 		if (event.target === loginModal) {
 			loginModal.style.display = 'none';
 		}
 	});
 
-	document.addEventListener('keydown', function (event) {
+	document.addEventListener('keydown', function(event) {
 		if (event.key === 'Escape' && loginModal.style.display === 'block') {
 			loginModal.style.display = 'none';
 		}
@@ -112,7 +115,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 var signUp = document.getElementById('signUp');
 
-signUp && signUp.addEventListener('click', function () {
+signUp && signUp.addEventListener('click', function() {
 	console.log('oi');
 
 
@@ -128,7 +131,7 @@ signUp && signUp.addEventListener('click', function () {
 
 var redirectLogin = document.getElementById('redirectLogin');
 
-redirectLogin && redirectLogin.addEventListener('click', function () {
+redirectLogin && redirectLogin.addEventListener('click', function() {
 	console.log('oi');
 
 	// Open the register modal (if applicable, using vanilla JavaScript):
@@ -141,31 +144,31 @@ redirectLogin && redirectLogin.addEventListener('click', function () {
 });
 
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
 	// Botões e modal
 	const openModalBtn = document.getElementById('openModalBtn');
 	const closeModalBtn = document.getElementById('closeModalBtn');
 	const registerModal = document.getElementById('registerModal');
 
 	// Abrir o modal ao clicar no botão
-	openModalBtn && openModalBtn.addEventListener('click', function () {
+	openModalBtn && openModalBtn.addEventListener('click', function() {
 		registerModal.style.display = 'block';
 	});
 
 	// Fechar o modal ao clicar no botão de fechar
-	closeModalBtn && closeModalBtn.addEventListener('click', function () {
+	closeModalBtn && closeModalBtn.addEventListener('click', function() {
 		registerModal.style.display = 'none';
 	});
 
 	// Fechar o modal se clicar fora dele
-	window.addEventListener('click', function (event) {
+	window.addEventListener('click', function(event) {
 		if (event.target === registerModal) {
 			registerModal.style.display = 'none';
 		}
 	});
 
 	// Fechar o modal ao pressionar Esc
-	document.addEventListener('keydown', function (event) {
+	document.addEventListener('keydown', function(event) {
 		if (event.key === 'Escape' && registerModal.style.display === 'block') {
 			registerModal.style.display = 'none';
 		}
@@ -173,7 +176,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	// Enviar dados do formulário (aqui você pode adicionar a lógica de envio)
 	const cadastroForm = document.getElementById('cadastroForm');
-	cadastroForm && cadastroForm.addEventListener('submit', function (event) {
+	cadastroForm && cadastroForm.addEventListener('submit', function(event) {
 		event.preventDefault();
 		// Adicione a lógica de envio do formulário aqui
 		console.log('Formulário enviado!');
@@ -182,9 +185,9 @@ document.addEventListener('DOMContentLoaded', function () {
 	});
 });
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
 	var togglePassword = document.getElementById('togglePassword');
-	togglePassword && togglePassword.addEventListener('click', function (e) {
+	togglePassword && togglePassword.addEventListener('click', function(e) {
 		// Previne o comportamento padrão do ícone
 		e.preventDefault();
 
@@ -199,9 +202,9 @@ document.addEventListener('DOMContentLoaded', function () {
 	});
 });
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
 	loginPassword = document.getElementById('loginPassword');
-	loginPassword && loginPassword.addEventListener('click', function (e) {
+	loginPassword && loginPassword.addEventListener('click', function(e) {
 		// Previne o comportamento padrão do ícone
 		e.preventDefault();
 
@@ -217,9 +220,9 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
-document.addEventListener('DOMContentLoaded', function () {
-	document.querySelectorAll('input[type=radio][name="userType"]').forEach(function (radio) {
-		radio.addEventListener('change', function () {
+document.addEventListener('DOMContentLoaded', function() {
+	document.querySelectorAll('input[type=radio][name="userType"]').forEach(function(radio) {
+		radio.addEventListener('change', function() {
 			var ageInput = document.getElementById('age');
 			var ageP = document.getElementById('p-age');
 
@@ -234,9 +237,9 @@ document.addEventListener('DOMContentLoaded', function () {
 	});
 });
 
-document.addEventListener('DOMContentLoaded', function () {
-	document.querySelectorAll('input[type=radio][name="userType"]').forEach(function (radio) {
-		radio.addEventListener('change', function () {
+document.addEventListener('DOMContentLoaded', function() {
+	document.querySelectorAll('input[type=radio][name="userType"]').forEach(function(radio) {
+		radio.addEventListener('change', function() {
 			var ageInput = document.getElementById('typeOfDisability');
 
 			if (radio.value === 'evaluator') {
@@ -248,48 +251,48 @@ document.addEventListener('DOMContentLoaded', function () {
 	});
 });
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
 	console.log('DOMContentLoaded event fired');
 
 	const cadastrarLocalModal = document.getElementById('cadastrarLocalModal');
-	cadastrarLocalModal && cadastrarLocalModal.addEventListener('click', function () {
+	cadastrarLocalModal && cadastrarLocalModal.addEventListener('click', function() {
 		cadastrarLocalModal.style.display = 'block';
 	});
 });
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
 	console.log('ABRIU ESSA PORCARIA');
 
 	const cadastrarLocalModal = document.getElementById('registerLocationBtn');
 	const modal = document.getElementById('registerLocationModal');
 	const btnClose = document.getElementById('closeRegisterLocation');
 
-	cadastrarLocalModal && cadastrarLocalModal.addEventListener('click', function () {
+	cadastrarLocalModal && cadastrarLocalModal.addEventListener('click', function() {
 		modal.style.display = 'block';
 	});
 
-	btnClose && btnClose.addEventListener('click', function () {
+	btnClose && btnClose.addEventListener('click', function() {
 		modal.style.display = 'none';
 	});
 
 	// Fechar o modal se clicar fora dele
-	window.addEventListener('click', function (event) {
+	window.addEventListener('click', function(event) {
 		if (event.target === modal) {
 			modal.style.display = 'none';
 		}
 	});
 
 	// Fechar o modal ao pressionar Esc
-	document.addEventListener('keydown', function (event) {
+	document.addEventListener('keydown', function(event) {
 		if (event.key === 'Escape' && modal.style.display === 'block') {
 			modal.style.display = 'none';
 		}
 	});
 });
 
-document.addEventListener('DOMContentLoaded', function () {
-	document.querySelectorAll('input[type=radio][name="typeOfEstablishment"]').forEach(function (radio) {
-		radio.addEventListener('change', function () {
+document.addEventListener('DOMContentLoaded', function() {
+	document.querySelectorAll('input[type=radio][name="typeOfEstablishment"]').forEach(function(radio) {
+		radio.addEventListener('change', function() {
 			var spanStartDate = document.getElementById('showEvent');
 
 			if (radio.value === 'event') {
@@ -301,9 +304,9 @@ document.addEventListener('DOMContentLoaded', function () {
 	});
 });
 
-document.addEventListener('DOMContentLoaded', function () {
-	document.querySelectorAll('input[type=radio][name="typeOfEstablishment"]').forEach(function (radio) {
-		radio.addEventListener('change', function () {
+document.addEventListener('DOMContentLoaded', function() {
+	document.querySelectorAll('input[type=radio][name="typeOfEstablishment"]').forEach(function(radio) {
+		radio.addEventListener('change', function() {
 			var typeOfCuisine = document.getElementById('showCalendar');
 
 			if (radio.value === 'restaurant') {
@@ -315,9 +318,9 @@ document.addEventListener('DOMContentLoaded', function () {
 	});
 });
 
-document.addEventListener('DOMContentLoaded', function () {
-	document.querySelectorAll('input[type=radio][name="typeOfEstablishment"]').forEach(function (radio) {
-		radio.addEventListener('change', function () {
+document.addEventListener('DOMContentLoaded', function() {
+	document.querySelectorAll('input[type=radio][name="typeOfEstablishment"]').forEach(function(radio) {
+		radio.addEventListener('change', function() {
 			var productType = document.getElementById('showStore');
 
 			if (radio.value === 'store') {
@@ -330,12 +333,12 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
-$('input[type="radio"]').on('click', function () {
+$('input[type="radio"]').on('click', function() {
 	$('#registerLocationModal').find('.modal-content').css({ width: 'auto', height: 'auto', 'max-height': '100%' });
 });
 
-$(document).ready(function () {
-	$('#cep-input').on("blur", async function () {
+$(document).ready(function() {
+	$('#cep-input').on("blur", async function() {
 		var cep = $('#cep-input').val();
 		var cepData = await getCEPData(cep);
 		console.log(cepData);
@@ -349,14 +352,14 @@ $(document).ready(function () {
 	});
 });
 
-var getCEPData = async function (cep) {
+var getCEPData = async function(cep) {
 	console.log("iniciado");
 	const data = await axios.get(`https://viacep.com.br/ws/${cep}/json/`)
-		.then(function (response) {
+		.then(function(response) {
 			return response.data;
 		})
-		.catch(function (error) {
+		.catch(function(error) {
 			return null;
-		}).finally(function () { console.log("finalizado") });
+		}).finally(function() { console.log("finalizado") });
 	return data;
 }
