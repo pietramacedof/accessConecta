@@ -22,6 +22,14 @@ public abstract class User {
 		this.watchword = password;
 	}
 	
+	public User (String firstName, String lastName, String email, String password, Integer id) {
+		this.fName = firstName;
+		this.lName = lastName;
+		this.email = email;
+		this.watchword = password;
+		this.id = id;
+	}
+	
 	
 	public User (String firstName, String lastName, String email) {
 		this.fName = firstName;

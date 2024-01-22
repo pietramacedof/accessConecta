@@ -9,6 +9,22 @@
     <welcome-file>default.jsp</welcome-file>
     <welcome-file>default.htm</welcome-file>
   </welcome-file-list>
+  <!-- Defina seu filtro CorsFilter -->
+    <filter>
+        <filter-name>CorsFilter</filter-name>
+        <filter-class>controller.CorsFilter</filter-class>
+        <!-- Configuração do parâmetro de inicialização -->
+        <init-param>
+            <param-name>cors.allowed.origins</param-name>
+            <param-value>http://localhost:5500</param-value>
+        </init-param>
+    </filter>
+
+    <!-- Mapeamento do filtro CorsFilter -->
+    <filter-mapping>
+        <filter-name>CorsFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
   <servlet>
     <description></description>
     <display-name>Hello</display-name>
@@ -49,4 +65,45 @@
     <servlet-name>Login</servlet-name>
     <url-pattern>/Login</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>RegisterLocation</display-name>
+    <servlet-name>RegisterLocation</servlet-name>
+    <servlet-class>controller.RegisterLocation</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>RegisterLocation</servlet-name>
+    <url-pattern>/RegisterLocation</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>HasLocation</display-name>
+    <servlet-name>HasLocation</servlet-name>
+    <servlet-class>controller.HasLocation</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>HasLocation</servlet-name>
+    <url-pattern>/HasLocation</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>IsLogged</display-name>
+    <servlet-name>IsLogged</servlet-name>
+    <servlet-class>controller.IsLogged</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>IsLogged</servlet-name>
+    <url-pattern>/IsLogged</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>CorsFilter</display-name>
+    <servlet-name>CorsFilter</servlet-name>
+    <servlet-class>controller.CorsFilter</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>CorsFilter</servlet-name>
+    <url-pattern>/CorsFilter</url-pattern>
+  </servlet-mapping>
+
 </web-app>

@@ -2,6 +2,7 @@ package controller;
 
 import jakarta.servlet.ServletException;
 
+
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -57,6 +58,7 @@ public class Cadastro extends HttpServlet {
 		System.out.println("Página acessada." + firstName);
 		response.setContentType("application/json;charset=UTF-8");
 		PrintWriter out = response.getWriter();
+		
 		if (dao.hasEmail(email)) {
 			String jsonResponse = "{\"status\": \"error\", \"message\": \"O e-mail informado já está cadastrado.\"}";
 			out.println(jsonResponse);

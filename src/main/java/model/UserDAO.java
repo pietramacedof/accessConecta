@@ -249,5 +249,31 @@ public class UserDAO {
 			System.out.println(e);
 		}
 	}
+	
+	 public Owner findOwnerByToken(String token) {
+	      String sql = "SELECT * FROM user_info WHERE token = ?";
+	      try {
+	          Connection conn = toConnect();
+	          PreparedStatement pstmt = conn.prepareStatement(sql);
+	          pstmt.setString(1, token);
+
+	          ResultSet rs = pstmt.executeQuery();
+	          if (rs.next()) {
+	              String fName = rs.getString("f_name");
+	              String lName = rs.getString("l_name");
+	              String email = rs.getString("email");
+	              String password = rs.getString("watchword");
+	              Date dob = rs.getDate("date_of_birth");
+	              Integer id = rs.getInt("id");
+
+	              Owner owner = new Owner(fName, lName, email, password, dob, id);
+	              owner.setToken(token);
+	              return owner;
+	          }
+	      } catch (SQLException e) {
+	          e.printStackTrace(); // Trate a exceção apropriadamente em um ambiente real
+	      }
+	      return null;
+	  }
 
 }

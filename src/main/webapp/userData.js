@@ -177,7 +177,7 @@ document.getElementById('formLogin').addEventListener('submit', function(event) 
 		email: email,
 		password: watchword
 	};
-	
+
 	if (!email || !watchword) {
 		console.log('Campo vazio');
 
@@ -186,7 +186,7 @@ document.getElementById('formLogin').addEventListener('submit', function(event) 
 
 		return;
 	}
-	
+
 	if (!valideEmail(email)) {
 		sendToast("error", "Formato de e-mail inválido.");
 		return;
@@ -211,8 +211,9 @@ document.getElementById('formLogin').addEventListener('submit', function(event) 
 				localStorage.setItem('dateOfBirth', data.dateOfBirth);
 				localStorage.setItem('userType', data.userType);
 				localStorage.setItem('token', data.token);
+				window.location.href='./owner.html';
 			}
-			else{
+			else {
 				localStorage.clear();
 				localStorage.setItem('firstName', data.firstName);
 				localStorage.setItem('lastName', data.lastName);
