@@ -9,22 +9,18 @@
     <welcome-file>default.jsp</welcome-file>
     <welcome-file>default.htm</welcome-file>
   </welcome-file-list>
-  <!-- Defina seu filtro CorsFilter -->
-    <filter>
-        <filter-name>CorsFilter</filter-name>
-        <filter-class>controller.CorsFilter</filter-class>
-        <!-- Configuração do parâmetro de inicialização -->
-        <init-param>
-            <param-name>cors.allowed.origins</param-name>
-            <param-value>http://localhost:5500</param-value>
-        </init-param>
-    </filter>
-
-    <!-- Mapeamento do filtro CorsFilter -->
-    <filter-mapping>
-        <filter-name>CorsFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
+  <filter>
+    <filter-name>CorsFilter</filter-name>
+    <filter-class>controller.CorsFilter</filter-class>
+    <init-param>
+      <param-name>cors.allowed.origins</param-name>
+      <param-value>http://localhost:5500</param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>CorsFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
   <servlet>
     <description></description>
     <display-name>Hello</display-name>
@@ -105,5 +101,54 @@
     <servlet-name>CorsFilter</servlet-name>
     <url-pattern>/CorsFilter</url-pattern>
   </servlet-mapping>
-
+  <servlet>
+    <description></description>
+    <display-name>DeleteLocation</display-name>
+    <servlet-name>DeleteLocation</servlet-name>
+    <servlet-class>controller.DeleteLocation</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>DeleteLocation</servlet-name>
+    <url-pattern>/DeleteLocation</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>DeleteLocal</display-name>
+    <servlet-name>DeleteLocal</servlet-name>
+    <servlet-class>controller.DeleteLocal</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>DeleteLocal</servlet-name>
+    <url-pattern>/DeleteLocal</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>AlterLocation</display-name>
+    <servlet-name>AlterLocation</servlet-name>
+    <servlet-class>controller.AlterLocation</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AlterLocation</servlet-name>
+    <url-pattern>/AlterLocation</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>AlterLocal</display-name>
+    <servlet-name>AlterLocal</servlet-name>
+    <servlet-class>controller.AlterLocal</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AlterLocal</servlet-name>
+    <url-pattern>/AlterLocal</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>EditLocal</display-name>
+    <servlet-name>EditLocal</servlet-name>
+    <servlet-class>controller.EditLocal</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>EditLocal</servlet-name>
+    <url-pattern>/EditLocal</url-pattern>
+  </servlet-mapping>
 </web-app>

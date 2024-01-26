@@ -9,6 +9,12 @@ public class Store extends Location{
 		this.typeProduct = typeProduct;
 	}
 
+	public Store(String id, String publicPlace, String neighborhood, String city, String uf, String placeName,
+			String cep, String number, String typeProduct) {
+		super(id, publicPlace, neighborhood, city, uf, placeName, cep, number);
+		this.typeProduct = typeProduct;
+	}
+	
 	public String getTypeProduct() {
 		return typeProduct;
 	}

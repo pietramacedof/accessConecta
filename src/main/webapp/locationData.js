@@ -199,65 +199,57 @@ document.getElementById('registerLocation').addEventListener('submit', function(
 	})
 		.then((response) => {
 			console.log(response.data);
-			var data = response.data;
 			console.log(data.status);
-			if (data.status === 'error') {
-				sendToast('error', data.message);
+			var result = response.data;
+			if (result.status == 'error') {
+				sendToast('error', result.message);
 				return;
 			}
 			resetFields();
-			sendToast(data.status, data.message);
-			localStorage.setItem('localData', JSON.stringify(data));
+			sendToast(result.status, result.message);
+
+
+
+			const storedData = JSON.parse(localStorage.getItem('dataLocation'));
+			data['id'] = generateRandomId();
+			data['placeName'] = locationName;
+			data['type'] = establishmentType;
+
+			console.log(data);
+
+			if (establishmentType == 'store') {
+				data['typeProduct'] = productType;
+			}
+			else if (establishmentType == 'restaurant') {
+				data['typeOfCuisine'] = cuisineType;
+			}
+			else {
+				price = document.querySelector('input[name="eventPrice"]:checked') ? document.querySelector('input[name="eventPrice"]:checked').value : null;
+				if (price == 'free') {
+					data['eventPrice'] = 1;
+				}
+				else {
+					data['eventPrice'] = 2;
+				}
+
+			}
+
+			if (storedData === null) {
+
+				localStorage.setItem('dataLocation', JSON.stringify(data));
+			} else {
+
+				storedData.push(data);
+				localStorage.setItem('dataLocation', JSON.stringify(storedData));
+			}
+
+
 			localStorage.setItem('hasLocation', true);
 
 
 			// Remova as classes existentes no ícone
-
-			if (establishmentType === 'restaurant') {
-
-				$('#hasLocation').append(`<div class="info-geral">
-        	<div id="locationInfo" class="location-info">
-        	<div class="header-location-info" id="nameLocal"><h2>${locationName}</h2><i class="fa-solid fa-utensils customIconUtensils"></i>
-        	</div>
-            <div class="content-location-info" id='infoLocal'>
-            <p><strong>Endereço:</strong> ${address}</p>
-            <p><strong>Dias de Abertura:</strong> ${operatingDays}</p>
-            </div>
-        	</div>
-        </div>`);
-
-
-			}
-			else if (establishmentType === 'event') {
-				startDateFormate = formateDate(startDate);
-				endDateFormate = formateDate(endDate);
-
-				$('#hasLocation').append(`<div class="info-geral">
-        	<div id="locationInfo" class="location-info">
-        	<div class="header-location-info" id="nameLocal"><h2>${locationName}</h2><i class="fa-solid fa-champagne-glasses customIconChampagne"></i>
-        	</div>
-            <div class="content-location-info" id='infoLocal'>
-            <p><strong>Endereço:</strong> ${address}</p>
-            <p><strong>Data de Início:</strong> ${startDateFormate}</p>
-            <p><strong>Data de Fim:</strong> ${endDateFormate}</p>
-            </div>
-        	</div>
-        </div>`);
-
-			}
-			else {
-				$('#hasLocation').append(`<div class="info-geral">
-        	<div id="locationInfo" class="location-info">
-        	<div class="header-location-info" id="nameLocal"><h2>${locationName}</h2><i class="fa-solid fa-store customIconStore"></i>
-        	</div>
-            <div class="content-location-info" id='infoLocal'>
-            <p><strong>Endereço:</strong> ${address}</p>
-            <p><strong>Tipo de Produto:</strong> ${productType}</p>
-            </div>
-        	</div>
-        </div>`);
-
-			}
+			$('#hasLocation').html('');
+			checkUserHasLocation(token);
 
 			$('#registerLocationModal').hide();
 			$('#noLocationInfo').hide();
@@ -303,21 +295,296 @@ function formateDate(date) {
 	return dataFormatada;
 }
 
-function displayLocationInformation() {
+function renderLocations(location, address, mapContainerId) {
+	const customId = mapContainerId;
+	if (location.type == 'restaurant') {
+		$('#hasLocation').append(`
+					        	<div id="locationInfo-${customId}" class="location-info">
+					        		<div class="header-location-info" id="nameLocal">
+					        			<h2>${location.placeName}</h2><i class="fa-solid fa-utensils customIconUtensils"></i>
+					        		</div>
+				            		<div class="content-location-info" id='infoLocal'>
+				            			<p><strong>Endereço:</strong> ${address}</p>
+				            			<p><strong>Dias de Abertura:</strong> ${location.operatingDays}</p>
+				            		</div>
+				            		<!-- Adicione um contêiner para o mapa com um ID exclusivo -->
+            						<div id="${mapContainerId}" class="map-container" style="height: 200px;"></div>
+						        	<div class="btn-section">
+			<button class="btn btn-primary" onClick="editLocal(${mapContainerId})">Editar</button><button class="btn btn-danger" onClick="deleteLocal(${mapContainerId})">Deletar</button>
+        	</div>
+								</div>
+        					`);
 
-	if (localStorage.getItem('hasLocation') === 'true') {
-
-		const localData = JSON.parse(localStorage.getItem('localData'));
-
-
-
-	} else {
-
+		initMap(address, mapContainerId);
+	}
+	else if (location.type == 'event') {
+		startDateFormate = formateDate(location.startDate);
+		endDateFormate = formateDate(location.endDate);
+		$('#hasLocation').append(`
+        	<div id="locationInfo-${customId}" class="location-info">
+        	<div class="header-location-info" id="nameLocal"><h2>${location.placeName}</h2><i class="fa-solid fa-champagne-glasses customIconChampagne"></i>
+        	</div>
+            <div class="content-location-info" id='infoLocal'>
+            <p><strong>Endereço:</strong> ${address}</p>
+            <p><strong>Data de Início:</strong> ${startDateFormate}</p>
+            <p><strong>Data de Fim:</strong> ${endDateFormate}</p>
+            </div>
+             <!-- Adicione um contêiner para o mapa com um ID exclusivo -->
+            <div id="${mapContainerId}" class="map-container" style="height: 200px;"></div>
+			<div class="btn-section">
+			<button class="btn btn-primary" onClick="editLocal(${mapContainerId})">Editar</button><button class="btn btn-danger" onClick="deleteLocal(${mapContainerId})">Deletar</button>
+        	</div>
+			</div>
+        	
+        `);
+		initMap(address, mapContainerId);
+	}
+	else {
+		$('#hasLocation').append(`
+        	<div id="locationInfo-${customId}" class="location-info">
+        	<div class="header-location-info" id="nameLocal"><h2>${location.placeName}</h2><i class="fa-solid fa-store customIconStore"></i>
+        	</div>
+            <div class="content-location-info" id='infoLocal'>
+            <p><strong>Endereço:</strong> ${address}</p>
+            <p><strong>Tipo de Produto:</strong> ${location.typeProduct}</p>
+            </div>
+            <!-- Adicione um contêiner para o mapa com um ID exclusivo -->
+            <div id="${mapContainerId}" class="map-container" style="height: 200px;"></div>
+        	<div class="btn-section">
+			<button class="btn btn-primary" onClick="editLocal(${mapContainerId})">Editar</button><button class="btn btn-danger" onClick="deleteLocal(${mapContainerId})">Deletar</button>
+        	</div>
+			</div>
+        	 
+        `);
+		initMap(address, mapContainerId);
 	}
 }
 
-// Call the function whenever you need to check and display location information
-displayLocationInformation();
+function editLocal(id) {
+    const locations = JSON.parse(localStorage.getItem('dataLocation'));
+  const location = locations.find((loc) => loc.id == id);
+  console.log(location);
+  //oculta todos os campos customizados
+  $('#rowRestaurant').hide();
+  $('#rowEvent').hide();
+  $('#rowStore').hide();
+
+  //seta os valores nos campos
+  $('#name').val(location.placeName);
+  $('#postalCode').val(location.cep);
+  $('#publicPlace').val(location.publicPlace);
+  $('#number').val(location.number);
+  $('#neighborhood').val(location.neighborhood);
+  $('#city').val(location.city);
+  $('#state').val(location.uf);
+  $('#idHidden').val(location.id);
+
+  if (location.type == 'restaurant') {
+    console.log('é restaurante');
+    $('#editTypeOfCuisine').val(location.typeOfCuisine);
+    $('#editOperatingDays').val(location.operatingDays);
+    $('#rowRestaurant').show();
+  }
+  else if (location.type == 'event') {
+    console.log('é evento');
+    var start = formateDate(location.startDate);
+    console.log(start);
+    $('#editStartDate').val(location.startDate);
+    $('#editEndDate').val(location.endDate);
+    $('#rowEvent').show();
+  }
+  else {
+    console.log('é loja');
+    $('#typeOfProduct').val(location.typeProduct)
+    $('#rowStore').show();
+  }
+  const myModal = document.getElementById('editData');
+  const bootstrapModal = new bootstrap.Modal(myModal);
+  bootstrapModal.show();
+
+}
+
+  $('#toAlterButton').on('click', function () {
+	var locationName = $('#name').val();
+	var postalCode = $('#postalCode').val();
+	var street = $('#publicPlace').val();
+	var neighborhood = $('#neighborhood').val();
+	var number = $('#number').val();
+	var city = $('#city').val();
+	var state = $('#state').val();
+	var id = $('#idHidden').val();
+	var address = `${street}, ${number}, ${neighborhood}, ${city}, ${state}`;
+	console.log(address);
+	switch (location.type) {
+		case 'restaurant':
+			var cuisineType = $('#editTypeOfCuisine').val();
+			var operatingDays = $('#editOperatingDays').val();
+			console.log(cuisineType, operatingDays);
+			if (!locationName || !postalCode || !street || !neighborhood || !number || !city || !state || !cuisineType || !operatingDays) {
+				console.log('Campo vazio');
+
+				sendToast("error", "Verifique se todos os campos estão preenchidos");
+				$('.pageload').hide();
+				return;
+			}
+			break;
+		case 'event':
+			var start = $('#editStartDate').val();
+			var end = $('#editEndDate').val();
+			console.log(end, start);
+			if (!locationName || !postalCode || !street || !neighborhood || !number || !city || !state || !start || !end) {
+				console.log('Campo vazio');
+
+				sendToast("error", "Verifique se todos os campos estão preenchidos");
+				$('.pageload').hide();
+				return;
+			}
+			if (valideDate(start)) {
+				if (!valideEndDate(start, end)) {
+					sendToast("error", "Data de fim inválida.");
+					return;
+				}
+			}
+			else {
+				sendToast("error", "Data de início inválida.");
+				return;
+			}
+			
+			break;
+		case 'store':
+			var productType = $('#typeOfProduct').val();
+			console.log(productType);
+			if (!locationName || !postalCode || !street || !neighborhood || !number || !city || !state || !productType) {
+				console.log('Campo vazio');
+
+				sendToast("error", "Verifique se todos os campos estão preenchidos");
+				$('.pageload').hide();
+				return;
+			}
+			break;	
+	}
+	  var data = {
+		locationName: locationName,
+		postalCode: postalCode,
+		street: street,
+		neighborhood: neighborhood,
+		number: number,
+		city: city,
+		state: state,
+		locationType: location.type,
+	};
+
+	switch (location.type) {
+		case 'restaurant':
+			data['cuisineType'] = cuisineType;
+			data['operatingDays'] = operatingDays;
+			break;
+		case 'event':
+			data['startDate'] = start;
+			data['endDate'] = end;
+			break;
+		case 'store':
+			data['productType'] = productType;
+			break;
+	}
+	let token = localStorage.getItem('token');
+	var url = './alterLocation';
+
+	  var cidade = "Igaporâ";
+
+
+var queryString = Object.keys(data).map(key => key + '=' + encodeURIComponent(data[key])).join('&');
+
+	axios.post(url, queryString, {
+		headers: {
+			'Content-Type': 'application/x-www-form-urlencoded',
+			'Authorization': `Bearer ${token}`
+		},
+	})
+
+
+
+	/*var data = {
+		locationId: $('#idHidden').val(),
+		locationName: locationName,
+		postalCode: postalCode,
+		street: street,
+		neighborhood: neighborhood,
+		number: number,
+		city: city,
+		state: state,
+		establishmentType: location.type,
+	};
+
+	switch (location.type) {
+		case 'restaurant':
+			data['cuisineType'] = cuisineType;
+			data['operatingDays'] = operatingDays;
+			break;
+		case 'event':
+			data['startDate'] = start;
+			data['endDate'] = end;
+			break;
+		case 'store':
+			data['productType'] = productType;
+			break;
+	}
+	var queryString = Object.keys(data).map(key => key + '=' + encodeURIComponent(data[key])).join('&');
+	console.log(data);
+	axios.put(apiUrl, queryString, {
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': `Bearer ${token}`
+		},
+	})
+  .then((response) => {
+    console.log(response);
+  })
+  .catch((error) => {
+    console.log(error);
+  });*/
+  });
+
+function deleteLocal(id) {
+	const myModal = document.getElementById('deleteData');
+	console.log('delete');
+	const bootstrapModal = new bootstrap.Modal(myModal);
+	bootstrapModal.show();
+	$('#deleteButton').attr('onClick', `sendDeleteLocal(${id})`);
+}
+
+function sendDeleteLocal(id) {
+	var queryString = 'id=' + encodeURIComponent(id);
+	console.log(queryString);
+	var apiUrl = './registerLocation';
+	var token = localStorage.getItem('token');
+	axios.delete(apiUrl, {
+		params: {
+			id: id
+		},
+		headers: {
+			'Authorization': `Bearer ${token}`
+		},
+	})
+		.then(response => {
+			var result = response.data;
+			console.log(response.data);
+			console.log(result);
+			sendToast(result.status, result.message);
+			$('#locationInfo-' + id).hide();
+			$('body').removeClass('modal-open');
+			$('body').attr('style', '');
+			$('#deleteData').hide();
+			$('#deleteData').removeClass('show');
+			$('.modal-backdrop').removeClass('show');
+			$('.modal-backdrop').remove();
+
+		})
+		.catch(error => {
+			console.error('Erro na requisição DELETE:', error);
+		});
+	console.log('requisição');
+}
 
 function checkUserHasLocation(token) {
 	console.log('checando locais');
@@ -332,7 +599,7 @@ function checkUserHasLocation(token) {
 
 			if (response.data.status == "success") {
 
-
+				localStorage.removeItem('dataLocation');
 				localStorage.setItem('dataLocation', JSON.stringify(response.data.locations));
 				const locations = response.data.locations;
 				$('#noLocationInfo').hide();
@@ -343,59 +610,10 @@ function checkUserHasLocation(token) {
 					locations.map((location, index) => {
 
 
-						const mapContainerId = `mapContainer${index}`;
+
 						var address = `${location.publicPlace}, ${location.number}, ${location.neighborhood}, ${location.city}, ${location.uf}`;
-						if (location.type == 'restaurant') {
-							$('#hasLocation').append(`
-					        	<div id="locationInfo" class="location-info">
-					        		<div class="header-location-info" id="nameLocal">
-					        			<h2>${location.placeName}</h2><i class="fa-solid fa-utensils customIconUtensils"></i>
-					        		</div>
-				            		<div class="content-location-info" id='infoLocal'>
-				            			<p><strong>Endereço:</strong> ${address}</p>
-				            			<p><strong>Dias de Abertura:</strong> ${location.operatingDays}</p>
-				            		</div>
-				            		<!-- Adicione um contêiner para o mapa com um ID exclusivo -->
-            						<div id="${mapContainerId}" class="map-container" style="height: 200px;"></div>
-					        	</div>
-        					`);
 
-							initMap(address, mapContainerId);
-						} else if (location.type == 'event') {
-							startDateFormate = formateDate(location.startDate);
-							endDateFormate = formateDate(location.endDate);
-							$('#hasLocation').append(`
-        	<div id="locationInfo" class="location-info">
-        	<div class="header-location-info" id="nameLocal"><h2>${location.placeName}</h2><i class="fa-solid fa-champagne-glasses customIconChampagne"></i>
-        	</div>
-            <div class="content-location-info" id='infoLocal'>
-            <p><strong>Endereço:</strong> ${address}</p>
-            <p><strong>Data de Início:</strong> ${startDateFormate}</p>
-            <p><strong>Data de Fim:</strong> ${endDateFormate}</p>
-            </div>
-             <!-- Adicione um contêiner para o mapa com um ID exclusivo -->
-            <div id="${mapContainerId}" class="map-container" style="height: 200px;"></div>
-        	</div>
-        	
-        `);
-							initMap(address, mapContainerId);
-						} else {
-							$('#hasLocation').append(`
-        	<div id="locationInfo" class="location-info">
-        	<div class="header-location-info" id="nameLocal"><h2>${location.placeName}</h2><i class="fa-solid fa-store customIconStore"></i>
-        	</div>
-            <div class="content-location-info" id='infoLocal'>
-            <p><strong>Endereço:</strong> ${address}</p>
-            <p><strong>Tipo de Produto:</strong> ${location.typeProduct}</p>
-            </div>
-            <!-- Adicione um contêiner para o mapa com um ID exclusivo -->
-            <div id="${mapContainerId}" class="map-container" style="height: 200px;"></div>
-        	</div>
-        	 
-        `);
-							initMap(address, mapContainerId);
-						}
-
+						renderLocations(location, address, location.id);
 						return;
 					})
 				}, 2000);
@@ -459,39 +677,28 @@ function initMap(address, mapContainerId) {
 	});
 }
 
-$('#filterRestaurant').click(function() {
+function filterType(type) {
 	var locations = JSON.parse(localStorage.getItem('dataLocation'));
-	$.each(locations, function(index, location) {
-		if (location.type === 'restaurant') {
-            console.log('restaurante');
-            $('.location-info').eq(index).show();
-        } else {
-            $('.location-info').eq(index).hide();
-        }
-	});
-});
+	$('.location-info').hide();
+	var filter = locations.filter((location, index) => location.type == type);
+	filter.map((location, index) => {
+		$('#locationInfo-' + location.id).show();
+		return;
+	})
+		;
+};
 
-$('#filterEvent').click(function() {
-	var locations = JSON.parse(localStorage.getItem('dataLocation'));
-	$.each(locations, function(index, location) {
-		if (location.type === 'event') {
-            $('.location-info').eq(index).show();
-        } else {
-            $('.location-info').eq(index).hide();
-        }
-	});
-});
+function showAll() {
+	$('.location-info').show();
+}
 
-$('#filterStore').click(function() {
-	var locations = JSON.parse(localStorage.getItem('dataLocation'));
-	$.each(locations, function(index, location) {
-		if (location.type === 'store') {
-            $('.location-info').eq(index).show();
-        } else {
-            $('.location-info').eq(index).hide();
-        }
-	});
-});
+var buttonClearFilter = $('#filterEverthing');
+buttonClearFilter.click(showAll);
+
+function generateRandomId() {
+	return Math.random().toString(36).substring(2, 15);
+}
+
 
 
 

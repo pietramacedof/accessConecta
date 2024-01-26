@@ -36,8 +36,29 @@
 				<div class="button-header">
 					<i id="lightModeIcon" class="fa-solid fa-sun"></i> <i
 						id="darkModeIcon" class="fa-solid fa-moon" style="display: none;"></i>
-					<button class="locations">Meus Locais</button>
-					<i class="fa-solid fa-user"></i>
+					<div class="dropdown">
+						<button class="btn btn-secondary dropdown-toggle" type="button"
+							data-bs-toggle="dropdown" aria-expanded="false">Meus
+							Locais</button>
+						<ul class="dropdown-menu">
+							<li><a id="registerLocationBtn" class="dropdown-item"
+								href="#">Novo Local</a></li>
+							<li><a class="dropdown-item" href="#">Deletar Local</a></li>
+							<li><a class="dropdown-item" href="#">Alterar Local here</a></li>
+						</ul>
+					</div>
+					<div class="dropdown">
+						<button class="btn btn-secondary dropdown-toggle locations"
+							type="button" data-bs-toggle="dropdown" aria-expanded="false">
+							<i class="fa-solid fa-user"></i>
+						</button>
+						<ul class="dropdown-menu">
+							<li><a class="dropdown-item" href="#">Alterar Senha</a></li>
+							<li><a class="dropdown-item" href="#">Deletar conta</a></li>
+							<li><a class="dropdown-item" href="#">Sair</a></li>
+						</ul>
+					</div>
+
 				</div>
 			</div>
 		</div>
@@ -62,9 +83,13 @@
 					data-bs-toggle="dropdown" aria-expanded="false" id="dropdownButton">
 					Filtrar Locais</button>
 				<ul class="dropdown-menu">
-					<li><a class="dropdown-item" id="filterRestaurant" href="#">Restaurante</a></li>
-					<li><a class="dropdown-item" id="filterEvent" href="#">Evento</a></li>
-					<li><a class="dropdown-item" id="filterStore" href="#">Loja</a></li>
+					<li><a class="dropdown-item" id="filterRestaurant"
+						onClick="filterType('restaurant')" href="#">Restaurante</a></li>
+					<li><a class="dropdown-item" id="filterEvent"
+						onClick="filterType('event')" href="#">Evento</a></li>
+					<li><a class="dropdown-item" id="filterStore"
+						onClick="filterType('store')" href="#">Loja</a></li>
+					<li><a class="dropdown-item" id="filterEverthing" href="#">Todos</a></li>
 				</ul>
 			</div>
 		</div>
@@ -250,6 +275,108 @@
 				data-delay="2000">
 				<div class="toast-body" id="message-toast">Hello, world! This
 					is a toast message.</div>
+			</div>
+		</div>
+
+		<div id="deleteData" class="modal" tabindex="-1">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Deletar Local</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"
+							aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<p>Tem certeza que deseja deletar este Local?</p>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary"
+							data-bs-dismiss="modal">Close</button>
+						<button id="deleteButton" type="button" class="btn btn-primary">Save
+							changes</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="editData" class="modal" tabindex="-1">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Editar Dados do Local</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"
+							aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<div class="row">
+							<div class="col-12 mb-3">
+								<input type="text" class="form-control"
+									id="name"
+									placeholder="Nome do Estabelecimento">
+								<input type="hidden"
+									id="idHidden">
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-3 mb-3">
+								<input type="text" class="form-control"
+									id="postalCode" placeholder="CEP">
+							</div>
+							<div class="col-6 mb-3">
+								<input type="text" class="form-control"
+									id="publicPlace" placeholder="Logradouro">
+							</div>
+							<div class="col-3 mb-3">
+								<input type="number" class="form-control"
+									id="number" placeholder="Número">
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-6 mb-3">
+								<input type="text" class="form-control"
+									id="neighborhood" placeholder="Bairro">
+							</div>
+							<div class="col-3 mb-3">
+								<input type="text" class="form-control"
+									id="city" placeholder="Cidade">
+							</div>
+							<div class="col-3 mb-3">
+								<input type="text" class="form-control"
+									id="state" placeholder="UF">
+							</div>
+						</div>
+						<div class="row" id = "rowStore" style="display:none;">
+							<div class="col-12 mb-3">
+								<input type="text" class="form-control"
+									id="typeOfProduct" placeholder="Tipo de Produto">
+							</div>
+						</div>
+						<div class="row" id="rowEvent" style="display:none;">
+							<div class="col-6 mb-3">
+								<input type="date" class="form-control"
+									id="editStartDate" placeholder="Data de início">
+							</div>
+							<div class="col-6 mb-3">
+								<input type="date" class="form-control"
+									id="editEndDate" placeholder="Data de fim">
+							</div>
+						</div>
+						<div class="row" id="rowRestaurant" style="display:none;">
+							<div class="col-6 mb-3">
+								<input type="text" class="form-control"
+									id="editTypeOfCuisine" placeholder="Tipo de Culinária">
+							</div>
+							<div class="col-6 mb-3">
+								<input type="text" class="form-control"
+									id="editOperatingDays" placeholder="Dias de funcionamento">
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button id="toAlterButton" type="button" class="btn btn-primary">Save
+							changes</button>
+					</div>
+				</div>
 			</div>
 		</div>
 

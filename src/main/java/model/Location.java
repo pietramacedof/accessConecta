@@ -1,7 +1,9 @@
 package model;
 
+import model.dao.LocationDAO;
+
 public class Location {
-	private Integer id;
+	private String id;
 	private String publicPlace;
 	private String neighborhood;
 	private String city;
@@ -10,9 +12,10 @@ public class Location {
 	private String cep;
 	private String number;
 	
+	
+	
 	public Location(String publicPlace, String neighborhood, String city, String uf, String placeName,
 			String cep, String number) {
-		super();
 		this.publicPlace = publicPlace;
 		this.neighborhood = neighborhood;
 		this.city = city;
@@ -21,12 +24,48 @@ public class Location {
 		this.cep = cep;
 		this.number = number;
 	}
+	
+	public Location() {
+		
+	}
+	
+	public Location(String id, String publicPlace, String neighborhood, String city, String uf, String placeName,
+			String cep, String number) {
+		this.id = id;
+		this.publicPlace = publicPlace;
+		this.neighborhood = neighborhood;
+		this.city = city;
+		this.uf = uf;
+		this.placeName = placeName;
+		this.cep = cep;
+		this.number = number;
+	}
+	
+	public boolean deleteLocation(String id) {
+		LocationDAO dao = new LocationDAO();
+		if(dao.deleteLocation(id)) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	public boolean isExist(Location location) {
+		LocationDAO dao = new LocationDAO();
+		if(dao.existLocation(location.getCep(), location.getPublicPlace(), location.getNumber(), location.getCity(), location.getUf())) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
 
-	public Integer getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 

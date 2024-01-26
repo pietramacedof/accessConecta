@@ -62,7 +62,23 @@ public class LocationDAO {
 			System.out.println(e);
 		}
 	}
+	
+    public boolean deleteLocation(String id) {
+        try (Connection conn = toConnect()) {
+            String sql = "DELETE FROM location WHERE location_id = ?";
+            
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setString(1, id);
 
+                int rowsAffected = pstmt.executeUpdate();
+
+                return rowsAffected > 0; // Retorna true se pelo menos uma linha foi afetada (excluída)
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Lida com exceções de SQL, substitua por um tratamento apropriado
+            return false;
+        }
+    }
 	public void insertEvent(Event event, Owner owner) {
 		String sql = "INSERT INTO location (location_user_id, location_public_place, location_neighborhood, location_city, location_uf,"
 				+ "location_place_name, location_cep, location_place_number, location_type, location_start_date, location_end_date, location_event_price) VALUES"
@@ -218,6 +234,7 @@ public class LocationDAO {
 
 	    // Criar e retornar um objeto Restaurant
 	    return new Restaurant(
+	    		resultSet.getString("location_id"),
 	            resultSet.getString("location_public_place"),
 	            resultSet.getString("location_neighborhood"),
 	            resultSet.getString("location_city"),
@@ -239,6 +256,7 @@ public class LocationDAO {
 
 	    // Criar e retornar um objeto Event
 	    return new Event(
+	    		resultSet.getString("location_id"),
 	    		resultSet.getString("location_public_place"),
 	            resultSet.getString("location_neighborhood"),
 	            resultSet.getString("location_city"),
@@ -258,6 +276,7 @@ public class LocationDAO {
 
 	    // Criar e retornar um objeto Store
 	    return new Store(
+	    		resultSet.getString("location_id"),
 	    		resultSet.getString("location_public_place"),
 	            resultSet.getString("location_neighborhood"),
 	            resultSet.getString("location_city"),

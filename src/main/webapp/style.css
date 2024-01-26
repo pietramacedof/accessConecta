@@ -500,7 +500,7 @@ section.dark-mode .about-container h3 {
 	background-color: rgba(0, 0, 0, 0.5);
 }
 
-.modal-content {
+/*.modal-content {
 	background-color: #F7F8FC;
 	padding: 20px;
 	margin: 50px auto;
@@ -511,7 +511,7 @@ section.dark-mode .about-container h3 {
 	flex-direction: column;
 	border-radius: 5px;
 	max-height: unset !important;
-}
+}*/
 
 .modal-content h2 {
 	color: #222222;
@@ -1020,10 +1020,6 @@ section.dark-mode .about-container h3 {
 	color: #ffffff;
 }
 
-#locationInfo.dark-mode {
-	background-color : #343637;
-}
-
 #hasLocation.dark-mode p {
 	color: #FFFFFF;
 }
@@ -1059,12 +1055,33 @@ section.dark-mode .about-container h3 {
         flex-direction: row;
         height: auto;
     }
+.btn-section{
+	display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+.btn-section button{
+	width: 50%;
+}
     
-    .btn btn-secondary {
-        background-color: #4086F4;
-   		border-width: inherit;
-    }
-
+    
+    
+    #hasLocation.dark-mode .location-info {
+	background-color: #343637;
+	}
+	
+	.modal-content-delete{
+    background-color: #F7F8FC;
+    padding: 20px;
+    margin: 50px auto;
+    width: 400px;
+    max-width: 600px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    max-height: unset !important;
+	}
 
 
 
