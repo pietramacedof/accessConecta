@@ -92,6 +92,84 @@ function resetFields() {
 
 }
 
+$('#toAlterPasswordBtn').on('click', function () {
+	$('#toAlterPassword').modal('show');
+	let firstName = localStorage.getItem('firstName');
+	let lastName = localStorage.getItem('lastName');
+	let userType = localStorage.getItem('userType');
+	let dateOfBirth = localStorage.getItem('dateOfBirth');
+	let email = localStorage.getItem('email');
+	let token = localStorage.getItem('token');
+
+	$('#userFirstName').val(firstName);
+    $('#userLast').val(lastName);
+    $('#userEmail').val(email);
+    $('#userDateOfBirth').val(dateOfBirth);
+    $('#userFirstName').prop('disabled', true);
+	$('#userLast').prop('disabled', true);
+	$('#userEmail').prop('disabled', true);
+	$('#userDateOfBirth').prop('disabled', true);
+	console.log(firstName, lastName, email);
+	
+});
+
+$('#confirmToAlterPassword').on('click', function () {
+	let password = $('#userPassword').val();
+	let confirmPassword = $('#userConfirmPassword').val();
+	let email = $('#userEmail').val();
+	let firstName = $('#userFirstName').val();
+	let lastName = $('#userLast').val();
+	let dateOfBirth = $('#userDateOfBirth').val();
+	if(!password || !confirmPassword){
+		sendToast("error", "Confira se todos os campos estão preenchidos.");
+		return;
+	}
+
+	console.log(password, confirmPassword, email, firstName);
+	
+	if(password != confirmPassword){
+		sendToast("error", "As senhas inseridas não correspondem.");
+		return;
+	}
+	let userType = localStorage.getItem('userType');
+	
+	let userData = {
+    password: password,
+    confirmPassword: confirmPassword,
+    email: email,
+    firstName: firstName,
+    lastName: lastName,
+	userType: userType,
+	dateOfBirth: dateOfBirth
+};
+
+	let apiUrl = './modifyPassword';
+	let token = localStorage.getItem('token');
+	axios.post(apiUrl, userData, {
+	   headers: {
+			'Content-Type': 'application/x-www-form-urlencoded',
+			'Authorization': `Bearer ${token}`
+		},
+	})
+	.then((response) => {
+			console.log(response.data);
+			console.log(data.status);
+			var result = response.data;
+			if (result.status == 'error') {
+				sendToast('error', result.message);
+				return;
+			}
+			sendToast(result.status, result.message);
+			customCloseModal('toAlterPassword');
+			
+		})
+		.catch((error) => {
+			console.error(error);
+			sendToast("error", "Dados inválidos, tente novamente!");
+		});
+	
+});
+
 document.getElementById('registerLocation').addEventListener('submit', function(event) {
 	event.preventDefault();
 	//checar campos vazios, sessão
@@ -295,33 +373,32 @@ function formateDate(date) {
 	return dataFormatada;
 }
 
-function renderLocations(location, address, mapContainerId) {
+function renderLocations(location, address, mapContainerId, isUpdate) {
 	const customId = mapContainerId;
+	var template = '';
 	if (location.type == 'restaurant') {
-		$('#hasLocation').append(`
-					        	<div id="locationInfo-${customId}" class="location-info">
-					        		<div class="header-location-info" id="nameLocal">
-					        			<h2>${location.placeName}</h2><i class="fa-solid fa-utensils customIconUtensils"></i>
-					        		</div>
-				            		<div class="content-location-info" id='infoLocal'>
-				            			<p><strong>Endereço:</strong> ${address}</p>
-				            			<p><strong>Dias de Abertura:</strong> ${location.operatingDays}</p>
-				            		</div>
-				            		<!-- Adicione um contêiner para o mapa com um ID exclusivo -->
-            						<div id="${mapContainerId}" class="map-container" style="height: 200px;"></div>
-						        	<div class="btn-section">
-			<button class="btn btn-primary" onClick="editLocal(${mapContainerId})">Editar</button><button class="btn btn-danger" onClick="deleteLocal(${mapContainerId})">Deletar</button>
-        	</div>
-								</div>
-        					`);
+		template = `
+			
+				<div class="header-location-info" id="nameLocal">
+					<h2>${location.placeName}</h2><i class="fa-solid fa-utensils customIconUtensils"></i>
+				</div>
+				<div class="content-location-info" id='infoLocal'>
+					<p><strong>Endereço:</strong> ${address}</p>
+					<p><strong>Dias de Abertura:</strong> ${location.operatingDays}</p>
+				</div>
+				<!-- Adicione um contêiner para o mapa com um ID exclusivo -->
+				<div id="${mapContainerId}" class="map-container" style="height: 200px;"></div>
+				<div class="btn-section">
+					<button class="btn btn-primary" onClick="editLocal(${mapContainerId})">Editar</button><button class="btn btn-danger" onClick="deleteLocal(${mapContainerId})">Deletar</button>
+				</div>
+			
+		`;
 
-		initMap(address, mapContainerId);
 	}
 	else if (location.type == 'event') {
 		startDateFormate = formateDate(location.startDate);
 		endDateFormate = formateDate(location.endDate);
-		$('#hasLocation').append(`
-        	<div id="locationInfo-${customId}" class="location-info">
+		template = `
         	<div class="header-location-info" id="nameLocal"><h2>${location.placeName}</h2><i class="fa-solid fa-champagne-glasses customIconChampagne"></i>
         	</div>
             <div class="content-location-info" id='infoLocal'>
@@ -334,14 +411,12 @@ function renderLocations(location, address, mapContainerId) {
 			<div class="btn-section">
 			<button class="btn btn-primary" onClick="editLocal(${mapContainerId})">Editar</button><button class="btn btn-danger" onClick="deleteLocal(${mapContainerId})">Deletar</button>
         	</div>
-			</div>
-        	
-        `);
-		initMap(address, mapContainerId);
+        	`
 	}
 	else {
-		$('#hasLocation').append(`
-        	<div id="locationInfo-${customId}" class="location-info">
+		template = 
+		`
+        	
         	<div class="header-location-info" id="nameLocal"><h2>${location.placeName}</h2><i class="fa-solid fa-store customIconStore"></i>
         	</div>
             <div class="content-location-info" id='infoLocal'>
@@ -353,11 +428,19 @@ function renderLocations(location, address, mapContainerId) {
         	<div class="btn-section">
 			<button class="btn btn-primary" onClick="editLocal(${mapContainerId})">Editar</button><button class="btn btn-danger" onClick="deleteLocal(${mapContainerId})">Deletar</button>
         	</div>
-			</div>
+			
         	 
-        `);
-		initMap(address, mapContainerId);
+        `;
+		
 	}
+	console.log(location, template)
+	initMap(address, mapContainerId);
+	if(isUpdate){
+		$(`#locationInfo-${customId}`).html(template);
+		return;
+	}
+	$('#hasLocation').append(`<div id="locationInfo-${customId}" class="location-info">${template}</div>`);
+		
 }
 
 function editLocal(id) {
@@ -378,7 +461,7 @@ function editLocal(id) {
   $('#city').val(location.city);
   $('#state').val(location.uf);
   $('#idHidden').val(location.id);
-
+  $('#typeHidden').val(location.type);
   if (location.type == 'restaurant') {
     console.log('é restaurante');
     $('#editTypeOfCuisine').val(location.typeOfCuisine);
@@ -404,6 +487,15 @@ function editLocal(id) {
 
 }
 
+function customCloseModal(id) {
+	$('body').removeClass('modal-open');
+			$('body').attr('style', '');
+			$('#' + id).hide();
+			$('#' + id).removeClass('show');
+			$('.modal-backdrop').removeClass('show');
+			$('.modal-backdrop').remove();
+}
+
   $('#toAlterButton').on('click', function () {
 	var locationName = $('#name').val();
 	var postalCode = $('#postalCode').val();
@@ -413,9 +505,11 @@ function editLocal(id) {
 	var city = $('#city').val();
 	var state = $('#state').val();
 	var id = $('#idHidden').val();
+	var type =  $('#typeHidden').val();
+	
 	var address = `${street}, ${number}, ${neighborhood}, ${city}, ${state}`;
 	console.log(address);
-	switch (location.type) {
+	switch (type) {
 		case 'restaurant':
 			var cuisineType = $('#editTypeOfCuisine').val();
 			var operatingDays = $('#editOperatingDays').val();
@@ -445,10 +539,7 @@ function editLocal(id) {
 					return;
 				}
 			}
-			else {
-				sendToast("error", "Data de início inválida.");
-				return;
-			}
+			
 			
 			break;
 		case 'store':
@@ -471,28 +562,36 @@ function editLocal(id) {
 		number: number,
 		city: city,
 		state: state,
-		locationType: location.type,
+		locationType: type,
+		locationId: id,
 	};
-
-	switch (location.type) {
+	  
+var updateData =     {
+        "id": 96,
+        "placeName": locationName,
+        "type": type,
+    };
+	switch (type) {
 		case 'restaurant':
 			data['cuisineType'] = cuisineType;
 			data['operatingDays'] = operatingDays;
+			updateData['cuisineType'] = cuisineType;
+			updateData['operatingDays'] = operatingDays;
 			break;
 		case 'event':
 			data['startDate'] = start;
 			data['endDate'] = end;
+			updateData['startDate'] = start;
+			updateData['endDate'] = end;
 			break;
 		case 'store':
 			data['productType'] = productType;
+			updateData['productType'] = productType;
 			break;
 	}
 	let token = localStorage.getItem('token');
 	var url = './alterLocation';
-
-	  var cidade = "Igaporâ";
-
-
+	console.log(data);
 var queryString = Object.keys(data).map(key => key + '=' + encodeURIComponent(data[key])).join('&');
 
 	axios.post(url, queryString, {
@@ -501,48 +600,24 @@ var queryString = Object.keys(data).map(key => key + '=' + encodeURIComponent(da
 			'Authorization': `Bearer ${token}`
 		},
 	})
-
-
-
-	/*var data = {
-		locationId: $('#idHidden').val(),
-		locationName: locationName,
-		postalCode: postalCode,
-		street: street,
-		neighborhood: neighborhood,
-		number: number,
-		city: city,
-		state: state,
-		establishmentType: location.type,
-	};
-
-	switch (location.type) {
-		case 'restaurant':
-			data['cuisineType'] = cuisineType;
-			data['operatingDays'] = operatingDays;
-			break;
-		case 'event':
-			data['startDate'] = start;
-			data['endDate'] = end;
-			break;
-		case 'store':
-			data['productType'] = productType;
-			break;
-	}
-	var queryString = Object.keys(data).map(key => key + '=' + encodeURIComponent(data[key])).join('&');
-	console.log(data);
-	axios.put(apiUrl, queryString, {
-		headers: {
-			'Content-Type': 'application/json',
-			'Authorization': `Bearer ${token}`
-		},
-	})
-  .then((response) => {
-    console.log(response);
-  })
-  .catch((error) => {
-    console.log(error);
-  });*/
+	  .then((response) => {
+			console.log(response.data);
+			console.log(data.status);
+			var result = response.data;
+			if (result.status == 'error') {
+				sendToast('error', result.message);
+				return;
+			}
+			resetFields();
+			sendToast(result.status, result.message);
+			renderLocations(updateData, address, id, true)
+			customCloseModal('editData');
+			
+		})
+		.catch((error) => {
+			console.error(error);
+			sendToast("error", "Dados inválidos, tente novamente!");
+		});
   });
 
 function deleteLocal(id) {
@@ -572,12 +647,7 @@ function sendDeleteLocal(id) {
 			console.log(result);
 			sendToast(result.status, result.message);
 			$('#locationInfo-' + id).hide();
-			$('body').removeClass('modal-open');
-			$('body').attr('style', '');
-			$('#deleteData').hide();
-			$('#deleteData').removeClass('show');
-			$('.modal-backdrop').removeClass('show');
-			$('.modal-backdrop').remove();
+			customCloseModal('deleteData');
 
 		})
 		.catch(error => {

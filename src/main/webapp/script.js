@@ -193,7 +193,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		// Alterna o tipo do campo de senha
 		var password = document.getElementById('password');
 		var type = password.getAttribute('type') === 'password' ? 'text' : 'password';
-		password.setAttribute('type', type);
+		password && password.setAttribute('type', type);
 
 		// Alterna a classe do ícone
 		this.classList.toggle('fa-eye');

@@ -1,5 +1,7 @@
 package model;
 
+import model.dao.LocationDAO;
+
 public class Restaurant extends Location{
 	private String typeOfCuisine;
 	private String operatingDays;
@@ -17,6 +19,16 @@ public class Restaurant extends Location{
 		super(id, publicPlace, neighborhood, city, uf, placeName, cep, number);
 		this.typeOfCuisine = typeOfCuisine;
 		this.operatingDays = operatingDays;
+	}
+	
+	public boolean updateLocation (Restaurant r) {
+		LocationDAO dao = new LocationDAO();
+		if(dao.updateRestaurant(r)) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 
 	public String getTypeOfCuisine() {

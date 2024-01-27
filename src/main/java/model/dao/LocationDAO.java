@@ -155,6 +155,142 @@ public class LocationDAO {
 		}
 		return false;
 	}
+	
+	public boolean existLocationAlter(String id, String postalCode, String street, String number, String city, String state) {
+		String sql = "SELECT COUNT(*) FROM location WHERE location_city = ? AND location_uf = ? AND location_cep = ?"
+				+ " AND location_place_number = ? AND location_public_place = ? AND location_id != ?"
+				;
+		boolean locationExists = false;
+		try (Connection conn = toConnect()) {
+			try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+				stmt.setString(1, city);
+				stmt.setString(2, state);
+				stmt.setString(3, postalCode);
+				stmt.setString(4, number);
+				stmt.setString(5, street);
+				stmt.setString(6, id);
+
+				try (ResultSet rs = stmt.executeQuery()) {
+					rs.next(); // Move to the first row
+					int count = rs.getInt(1); // Get the count from the first column
+					locationExists = count >= 1;
+				}
+			}
+		} catch (SQLException e) {
+			// Handle SQL exceptions appropriately
+			System.err.println("Error checking location existence: " + e.getMessage());
+			// Consider logging the error or throwing a custom exception
+		}
+
+		return locationExists;
+	}
+	
+	public boolean updateEvent(Event e) {
+	    String sql = "UPDATE location SET " +
+	            "location_city = ?, " +
+	            "location_uf = ?, " +
+	            "location_cep = ?, " +
+	            "location_place_number = ?, " +
+	            "location_public_place = ?, " +
+	            "location_start_date = ?, " +
+	            "location_end_date = ?, " +
+	            "location_place_name = ? " + 
+	            "WHERE location_id = ?";
+
+	    try (Connection connection = toConnect();
+	         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+	        // Set the values for the placeholders in the SQL statement
+	        preparedStatement.setString(1, e.getCity());
+	        preparedStatement.setString(2, e.getUf());
+	        preparedStatement.setString(3, e.getCep());
+	        preparedStatement.setString(4, e.getNumber());
+	        preparedStatement.setString(5, e.getPublicPlace());
+	        preparedStatement.setDate(6, (Date) e.getStartDate());
+	        preparedStatement.setDate(7, (Date) e.getEndDate());
+	        preparedStatement.setString(8, e.getPlaceName());
+	        preparedStatement.setString(9, e.getId());
+
+	        int rowsUpdated = preparedStatement.executeUpdate();
+
+	        return rowsUpdated > 0;
+
+	    } catch (SQLException ex) {
+	        ex.printStackTrace(); // Handle the exception appropriately based on your application's requirements
+	        return false;
+	    }
+	}
+	
+	public boolean updateStore(Store s) {
+	    String sql = "UPDATE location SET " +
+	            "location_city = ?, " +
+	            "location_uf = ?, " +
+	            "location_cep = ?, " +
+	            "location_place_number = ?, " +
+	            "location_public_place = ?, " +
+	            "location_type_product = ?, " +
+	            "location_place_name = ? " + 
+	            "WHERE location_id = ?";
+
+	    try (Connection connection = toConnect();
+	         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+	        // Set the values for the placeholders in the SQL statement
+	        preparedStatement.setString(1, s.getCity());
+	        preparedStatement.setString(2, s.getUf());
+	        preparedStatement.setString(3, s.getCep());
+	        preparedStatement.setString(4, s.getNumber());
+	        preparedStatement.setString(5, s.getPublicPlace());
+	        preparedStatement.setString(6, s.getTypeProduct());
+	        preparedStatement.setString(7, s.getPlaceName());
+	        preparedStatement.setString(8, s.getId());
+
+	        int rowsUpdated = preparedStatement.executeUpdate();
+
+	        return rowsUpdated > 0;
+
+	    } catch (SQLException ex) {
+	        ex.printStackTrace(); // Handle the exception appropriately based on your application's requirements
+	        return false;
+	    }
+	}
+
+	
+	  public boolean updateRestaurant(Restaurant r) {
+	        String sql = "UPDATE location SET " +
+	                "location_city = ?, " +
+	                "location_uf = ?, " +
+	                "location_cep = ?, " +
+	                "location_place_number = ?, " +
+	                "location_public_place = ?, " +
+	                "location_type_of_cuisine = ?, " +
+	                "location_operating_days = ?, " +  // Add a comma here
+	                "location_place_name = ? " + 
+	                "WHERE location_id = ?";
+
+	        try (Connection connection = toConnect();
+	             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+	            // Set the values for the placeholders in the SQL statement
+	            preparedStatement.setString(1, r.getCity());
+	            preparedStatement.setString(2, r.getUf());
+	            preparedStatement.setString(3, r.getCep());
+	            preparedStatement.setString(4, r.getNumber());
+	            preparedStatement.setString(5, r.getPublicPlace());
+	            preparedStatement.setString(6, r.getTypeOfCuisine());
+	            preparedStatement.setString(7, r.getOperatingDays());
+	            preparedStatement.setString(8, r.getPlaceName());
+	            preparedStatement.setString(9, r.getId());
+
+	            int rowsUpdated = preparedStatement.executeUpdate();
+
+	            return rowsUpdated > 0;
+
+	        } catch (SQLException e) {
+	            e.printStackTrace(); // Handle the exception appropriately based on your application's requirements
+	            return false;
+	        }
+	    }
 
 	public boolean existLocation(String postalCode, String street, String number, String city, String state) {
 		String sql = "SELECT COUNT(*) FROM location WHERE location_city = ? AND location_uf = ? AND location_cep = ? AND location_place_number = ? "
@@ -269,6 +405,8 @@ public class LocationDAO {
 	            eventPrice
 	    );
 	}
+	
+	
 	
 	private Store createStoreFromResultSet(ResultSet resultSet) throws SQLException {
 	    // Extrair atributos específicos de Store do ResultSet

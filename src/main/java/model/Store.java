@@ -1,5 +1,7 @@
 package model;
 
+import model.dao.LocationDAO;
+
 public class Store extends Location{
 	private String typeProduct;
 
@@ -13,6 +15,16 @@ public class Store extends Location{
 			String cep, String number, String typeProduct) {
 		super(id, publicPlace, neighborhood, city, uf, placeName, cep, number);
 		this.typeProduct = typeProduct;
+	}
+	
+	public boolean updateLocation (Store s) {
+		LocationDAO dao = new LocationDAO();
+		if(dao.updateStore(s)) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 	
 	public String getTypeProduct() {

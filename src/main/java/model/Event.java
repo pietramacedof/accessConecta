@@ -2,6 +2,8 @@ package model;
 
 import java.util.Date;
 
+import model.dao.LocationDAO;
+
 public class Event extends Location{
 	private Date startDate;
 	private Date endDate;
@@ -24,6 +26,16 @@ public class Event extends Location{
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.eventPrice = eventPrice;
+	}
+	
+	public boolean updateLocation (Event e) {
+		LocationDAO dao = new LocationDAO();
+		if(dao.updateEvent(e)) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 
 	public void setStartDate(Date startDate) {

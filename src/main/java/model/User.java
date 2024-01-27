@@ -1,7 +1,8 @@
 package model;
 
+import java.sql.SQLException;
 
-public abstract class User {
+public class User {
 
 	private Integer id;
 	private String fName;
@@ -30,12 +31,17 @@ public abstract class User {
 		this.id = id;
 	}
 	
-	
-	public User (String firstName, String lastName, String email) {
+	public User (String firstName, String lastName, String email, String password, Integer id, Integer userType) {
 		this.fName = firstName;
 		this.lName = lastName;
 		this.email = email;
+		this.watchword = password;
+		this.id = id;
+		this.userType = userType;
 	}
+	
+	
+	
 
 	public Integer getId() {
 		return id;
@@ -93,6 +99,20 @@ public abstract class User {
 	public void setToken(String token) {
 		this.token = token;
 	}
+	
+	public User findUserByToken(String token) {
+		UserDAO dao = new UserDAO();
+		return dao.findUserByToken(token);
+	}
 
-
+	
+	public boolean toAlterPassword (User user, String password) throws SQLException {
+		UserDAO dao = new UserDAO();
+		if(dao.toAlterPassword(user, password)) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
 }

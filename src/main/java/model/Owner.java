@@ -28,5 +28,10 @@ public class Owner extends User {
 	public void setDateOfBirth(Date dateOfBirth) {
 		this.dateOfBirth = dateOfBirth;
 	}
+	
+	public Owner findOwnerByToken (String token) {
+		UserDAO dao = new UserDAO();
+		return dao.findOwnerByToken(token);
+	}
 
 }

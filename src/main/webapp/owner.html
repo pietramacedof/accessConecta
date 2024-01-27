@@ -53,7 +53,8 @@
 							<i class="fa-solid fa-user"></i>
 						</button>
 						<ul class="dropdown-menu">
-							<li><a class="dropdown-item" href="#">Alterar Senha</a></li>
+							<li><a id="toAlterPasswordBtn" class="dropdown-item"
+								href="#">Alterar Senha</a></li>
 							<li><a class="dropdown-item" href="#">Deletar conta</a></li>
 							<li><a class="dropdown-item" href="#">Sair</a></li>
 						</ul>
@@ -298,6 +299,69 @@
 				</div>
 			</div>
 		</div>
+		<div id="toAlterPassword" class="modal" tabindex="-1">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Alterar senha</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"
+							aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<div class="row ">
+							<div class="col-12 mb-3 input-group">
+								<span class="input-group-text" id="inputGroup-sizing-sm"><i
+									class="fa-regular fa-user"></i></span> <input type="text"
+									id="userFirstName" class="form-control" />
+							</div>
+						</div>
+						<div class="row ">
+							<div class="col-12 mb-3 input-group">
+								<span class="input-group-text" id="inputGroup-sizing-sm"><i
+									class="fa-regular fa-user"></i></span> <input type="text"
+									id="userLast" class="form-control" />
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-12 mb-3 input-group">
+								<span class="input-group-text" id="inputGroup-sizing-sm"><i
+									class="fa-regular fa-envelope"></i></span> <input type="email"
+									id="userEmail" class="form-control" />
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-12 input-group mb-3">
+								<span class="input-group-text"> <i
+									class="fa-solid fa-calendar-days"></i>
+								</span> <input type="date" class="form-control" id="userDateOfBirth" />
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-12 mb-3 input-group">
+								<span class="input-group-text" id="inputGroup-sizing-sm"><i
+									class="fa-regular fa-eye" id="togglePassword"></i></span> <input
+									type="password" class="form-control" id="userPassword"
+									placeholder="Nova senha"/>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-12 mb-3 input-group">
+								<span class="input-group-text" id="inputGroup-sizing-sm"><i
+									class="fa-regular fa-eye" id="togglePassword"></i></span> <input
+									type="password" class="form-control" id="userConfirmPassword"
+									placeholder="Confirme a senha"/>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary"
+							data-bs-dismiss="modal">Close</button>
+						<button id="confirmToAlterPassword" type="button" class="btn btn-primary">Save
+							changes</button>
+					</div>
+				</div>
+			</div>
+		</div>
 
 		<div id="editData" class="modal" tabindex="-1">
 			<div class="modal-dialog">
@@ -310,65 +374,64 @@
 					<div class="modal-body">
 						<div class="row">
 							<div class="col-12 mb-3">
-								<input type="text" class="form-control"
-									id="name"
-									placeholder="Nome do Estabelecimento">
-								<input type="hidden"
-									id="idHidden">
+								<input type="text" class="form-control" id="name"
+									placeholder="Nome do Estabelecimento"> <input
+									type="hidden" id="idHidden"> <input type="hidden"
+									id="typeHidden">
 							</div>
 						</div>
 						<div class="row">
 							<div class="col-3 mb-3">
-								<input type="text" class="form-control"
-									id="postalCode" placeholder="CEP">
+								<input type="text" class="form-control" id="postalCode"
+									placeholder="CEP">
 							</div>
 							<div class="col-6 mb-3">
-								<input type="text" class="form-control"
-									id="publicPlace" placeholder="Logradouro">
+								<input type="text" class="form-control" id="publicPlace"
+									placeholder="Logradouro">
 							</div>
 							<div class="col-3 mb-3">
-								<input type="number" class="form-control"
-									id="number" placeholder="Número">
+								<input type="number" class="form-control" id="number"
+									placeholder="Número">
 							</div>
 						</div>
 						<div class="row">
 							<div class="col-6 mb-3">
-								<input type="text" class="form-control"
-									id="neighborhood" placeholder="Bairro">
+								<input type="text" class="form-control" id="neighborhood"
+									placeholder="Bairro">
 							</div>
 							<div class="col-3 mb-3">
-								<input type="text" class="form-control"
-									id="city" placeholder="Cidade">
+								<input type="text" class="form-control" id="city"
+									placeholder="Cidade">
 							</div>
 							<div class="col-3 mb-3">
-								<input type="text" class="form-control"
-									id="state" placeholder="UF">
+								<input type="text" class="form-control" id="state"
+									placeholder="UF">
 							</div>
 						</div>
-						<div class="row" id = "rowStore" style="display:none;">
+						<div class="row" id="rowStore" style="display: none;">
 							<div class="col-12 mb-3">
-								<input type="text" class="form-control"
-									id="typeOfProduct" placeholder="Tipo de Produto">
+								<input type="text" class="form-control" id="typeOfProduct"
+									placeholder="Tipo de Produto">
 							</div>
 						</div>
-						<div class="row" id="rowEvent" style="display:none;">
+						<div class="row" id="rowEvent" style="display: none;">
 							<div class="col-6 mb-3">
-								<input type="date" class="form-control"
-									id="editStartDate" placeholder="Data de início">
+								<input type="date" class="form-control" id="editStartDate"
+									placeholder="Data de início">
 							</div>
 							<div class="col-6 mb-3">
-								<input type="date" class="form-control"
-									id="editEndDate" placeholder="Data de fim">
+								<input type="date" class="form-control" id="editEndDate"
+									placeholder="Data de fim">
 							</div>
 						</div>
-						<div class="row" id="rowRestaurant" style="display:none;">
+						<div class="row" id="rowRestaurant" style="display: none;">
 							<div class="col-6 mb-3">
-								<input type="text" class="form-control"
-									id="editTypeOfCuisine" placeholder="Tipo de Culinária">
+								<input type="text" class="form-control" id="editTypeOfCuisine"
+									placeholder="Tipo de Culinária">
 							</div>
 							<div class="col-6 mb-3">
-								<input type="text" class="form-control"
-									id="editOperatingDays" placeholder="Dias de funcionamento">
+								<input type="text" class="form-control" id="editOperatingDays"
+									placeholder="Dias de funcionamento">
 							</div>
 						</div>
 					</div>

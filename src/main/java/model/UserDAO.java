@@ -275,5 +275,47 @@ public class UserDAO {
 	      }
 	      return null;
 	  }
+	 
+	 public User findUserByToken(String token) {
+	      String sql = "SELECT * FROM user_info WHERE token = ?";
+	      try {
+	          Connection conn = toConnect();
+	          PreparedStatement pstmt = conn.prepareStatement(sql);
+	          pstmt.setString(1, token);
 
+	          ResultSet rs = pstmt.executeQuery();
+	          if (rs.next()) {
+	              String fName = rs.getString("f_name");
+	              String lName = rs.getString("l_name");
+	              String email = rs.getString("email");
+	              String password = rs.getString("watchword");
+	              Integer userType = rs.getInt("user_type");
+	              Integer id = rs.getInt("id");
+
+	              User user = new User(fName, lName, email, password, id,  userType);
+	              user.setToken(token);
+	              return user;
+	          }
+	      } catch (SQLException e) {
+	          e.printStackTrace(); 
+	        }
+	      return null;
+	  }
+	 
+	 public boolean toAlterPassword(User user, String password) throws SQLException {
+	        try (Connection connection = toConnect()) {
+	            
+	            String sql = "UPDATE user_info SET watchword = ? WHERE email = ?";
+	            password = hashPassword(password);
+	            System.out.println("Password hash: " + password);
+	            PreparedStatement statement = connection.prepareStatement(sql);
+
+	            statement.setString(1, password);
+	            statement.setString(2, user.getEmail());
+	           
+	            int rowsAffected = statement.executeUpdate();
+	            
+	            return rowsAffected > 0;
+	        }
+	    }
 }

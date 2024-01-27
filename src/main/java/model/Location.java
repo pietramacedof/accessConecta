@@ -51,9 +51,11 @@ public class Location {
 		}
 	}
 	
+	
+	
 	public boolean isExist(Location location) {
 		LocationDAO dao = new LocationDAO();
-		if(dao.existLocation(location.getCep(), location.getPublicPlace(), location.getNumber(), location.getCity(), location.getUf())) {
+		if(dao.existLocationAlter(location.getId(), location.getCep(), location.getPublicPlace(), location.getNumber(), location.getCity(), location.getUf())) {
 			return true;
 		}
 		else {

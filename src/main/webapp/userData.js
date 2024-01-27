@@ -159,6 +159,12 @@ document.getElementById('registerForm').addEventListener('submit', function(even
 	}
 });
 
+ $('#toAlterPasswordBtn').on('click', function () {
+	 const myModal = document.getElementById('toAlterPassword');
+ 	 const bootstrapModal = new bootstrap.Modal(myModal);
+  	 bootstrapModal.show();
+	 });
+
 document.getElementById('formLogin').addEventListener('submit', function(event) {
 	event.preventDefault();
 
