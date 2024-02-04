@@ -316,18 +316,16 @@ document.getElementById('registerLocation').addEventListener('submit', function(
 
 				localStorage.setItem('dataLocation', JSON.stringify(data));
 			} else {
-
 				storedData.push(data);
 				localStorage.setItem('dataLocation', JSON.stringify(storedData));
 			}
 
+			renderLocations(data, address, data.id);
 
 			localStorage.setItem('hasLocation', true);
 
 
-			// Remova as classes existentes no ícone
-			$('#hasLocation').html('');
-			checkUserHasLocation(token);
+			
 
 			$('#registerLocationModal').hide();
 			$('#noLocationInfo').hide();
@@ -628,6 +626,24 @@ function deleteLocal(id) {
 	$('#deleteButton').attr('onClick', `sendDeleteLocal(${id})`);
 }
 
+function updateDelete(array, id) {
+    if(array.length === 0) return;
+    const newArray = array.filter(objeto => objeto.id !== id);
+    
+    // Retorna o array atualizado
+    return newArray;
+}
+
+function handleSections(array){
+	if(array.length > 0){
+		$('#noLocationInfo').hide();
+		$('#hasLocationSection').show();
+		return;
+	}
+	$('#noLocationInfo').show();
+	$('#hasLocationSection').hide();
+}
+
 function sendDeleteLocal(id) {
 	var queryString = 'id=' + encodeURIComponent(id);
 	console.log(queryString);
@@ -645,8 +661,12 @@ function sendDeleteLocal(id) {
 			var result = response.data;
 			console.log(response.data);
 			console.log(result);
+			var dataLocation = JSON.parse(localStorage.getItem('dataLocation'));
+			let locationsDelete = updateDelete(dataLocation, id);
+			localStorage.setItem('dataLocation', JSON.stringify(locationsDelete));
 			sendToast(result.status, result.message);
 			$('#locationInfo-' + id).hide();
+			handleSections(locationsDelete);
 			customCloseModal('deleteData');
 
 		})
@@ -691,6 +711,7 @@ function checkUserHasLocation(token) {
 
 				return;
 			}
+			localStorage.removeItem('dataLocation');
 			localStorage.setItem('hasLocation', false);
 
 		})
@@ -769,6 +790,13 @@ function generateRandomId() {
 	return Math.random().toString(36).substring(2, 15);
 }
 
+
+document.getElementById('closeSession').addEventListener('click', function() {
+    console.log('caiu');
+	localStorage.clear();
+	window.location.href = './';
+	
+});
 
 
 

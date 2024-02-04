@@ -500,7 +500,7 @@ section.dark-mode .about-container h3 {
 	background-color: rgba(0, 0, 0, 0.5);
 }
 
-/*.modal-content {
+.modal-container{
 	background-color: #F7F8FC;
 	padding: 20px;
 	margin: 50px auto;
@@ -511,11 +511,11 @@ section.dark-mode .about-container h3 {
 	flex-direction: column;
 	border-radius: 5px;
 	max-height: unset !important;
-}*/
+}
 
-.modal-content h2 {
-	color: #222222;
-	font-family: Volkhov;
+.modal-container h2 {
+	color:#4086F4;
+	font-family: Poppins;
 	font-weight: bolder;
 	font-size: 30px;
 	text-align: left;

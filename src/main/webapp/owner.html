@@ -34,32 +34,25 @@
 						src="assets/access-conecta.png" alt="Logo">
 				</div>
 				<div class="button-header">
-					<i id="lightModeIcon" class="fa-solid fa-sun"></i> <i
-						id="darkModeIcon" class="fa-solid fa-moon" style="display: none;"></i>
-					<div class="dropdown">
-						<button class="btn btn-secondary dropdown-toggle" type="button"
-							data-bs-toggle="dropdown" aria-expanded="false">Meus
-							Locais</button>
-						<ul class="dropdown-menu">
-							<li><a id="registerLocationBtn" class="dropdown-item"
-								href="#">Novo Local</a></li>
-							<li><a class="dropdown-item" href="#">Deletar Local</a></li>
-							<li><a class="dropdown-item" href="#">Alterar Local here</a></li>
-						</ul>
-					</div>
+					
+					<button id="registerLocationBtn" class="locations">Novo
+						Local</button>
+					<button class="locations">Meus Locais</button>
 					<div class="dropdown">
 						<button class="btn btn-secondary dropdown-toggle locations"
-							type="button" data-bs-toggle="dropdown" aria-expanded="false">
+							type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width:50px;">
 							<i class="fa-solid fa-user"></i>
 						</button>
 						<ul class="dropdown-menu">
 							<li><a id="toAlterPasswordBtn" class="dropdown-item"
 								href="#">Alterar Senha</a></li>
 							<li><a class="dropdown-item" href="#">Deletar conta</a></li>
-							<li><a class="dropdown-item" href="#">Sair</a></li>
+							<li><a id="closeSession" class="dropdown-item" href="#"
+								style="color: red;">Sair</a></li>
 						</ul>
 					</div>
-
+					<i id="lightModeIcon" class="fa-solid fa-sun"></i> <i
+						id="darkModeIcon" class="fa-solid fa-moon" style="display: none;"></i>
 				</div>
 			</div>
 		</div>
@@ -111,9 +104,9 @@
 				</div>
 			</div>
 		</footer>
-
+ 
 		<div id="registerLocationModal" class="modal">
-			<div class="modal-content">
+			<div class="modal-container">
 				<div class="modal-header">
 					<h5 class="modal-title">Novo Local</h5>
 
@@ -291,10 +284,7 @@
 						<p>Tem certeza que deseja deletar este Local?</p>
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary"
-							data-bs-dismiss="modal">Close</button>
-						<button id="deleteButton" type="button" class="btn btn-primary">Save
-							changes</button>
+						<button id="deleteButton" type="button" class="btn btn-primary">Salvar</button>
 					</div>
 				</div>
 			</div>
@@ -341,7 +331,7 @@
 								<span class="input-group-text" id="inputGroup-sizing-sm"><i
 									class="fa-regular fa-eye" id="togglePassword"></i></span> <input
 									type="password" class="form-control" id="userPassword"
-									placeholder="Nova senha"/>
+									placeholder="Nova senha" />
 							</div>
 						</div>
 						<div class="row">
@@ -349,15 +339,13 @@
 								<span class="input-group-text" id="inputGroup-sizing-sm"><i
 									class="fa-regular fa-eye" id="togglePassword"></i></span> <input
 									type="password" class="form-control" id="userConfirmPassword"
-									placeholder="Confirme a senha"/>
+									placeholder="Confirme a senha" />
 							</div>
 						</div>
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary"
-							data-bs-dismiss="modal">Close</button>
-						<button id="confirmToAlterPassword" type="button" class="btn btn-primary">Save
-							changes</button>
+						<button id="confirmToAlterPassword" type="button"
+							class="btn btn-primary">Salvar</button>
 					</div>
 				</div>
 			</div>
@@ -436,8 +424,7 @@
 						</div>
 					</div>
 					<div class="modal-footer">
-						<button id="toAlterButton" type="button" class="btn btn-primary">Save
-							changes</button>
+						<button id="toAlterButton" type="button" class="btn btn-primary">Salvar</button>
 					</div>
 				</div>
 			</div>
