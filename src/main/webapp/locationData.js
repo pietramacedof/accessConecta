@@ -286,10 +286,11 @@ document.getElementById('registerLocation').addEventListener('submit', function(
 			resetFields();
 			sendToast(result.status, result.message);
 
-
+			const locationId = result.locationId;
+			console.log('ID retornado:', locationId);
 
 			const storedData = JSON.parse(localStorage.getItem('dataLocation'));
-			data['id'] = generateRandomId();
+			data['id'] = locationId;
 			data['placeName'] = locationName;
 			data['type'] = establishmentType;
 
@@ -385,7 +386,7 @@ function renderLocations(location, address, mapContainerId, isUpdate) {
 					<p><strong>Dias de Abertura:</strong> ${location.operatingDays}</p>
 				</div>
 				<!-- Adicione um contêiner para o mapa com um ID exclusivo -->
-				<div id="${mapContainerId}" class="map-container" style="height: 200px;"></div>
+				<div id="9" class="map-container" style="height: 200px;"></div>
 				<div class="btn-section">
 					<button class="btn btn-primary" onClick="editLocal(${mapContainerId})">Editar</button><button class="btn btn-danger" onClick="deleteLocal(${mapContainerId})">Deletar</button>
 				</div>

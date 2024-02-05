@@ -227,6 +227,7 @@ document.getElementById('formLogin').addEventListener('submit', function(event) 
 				localStorage.setItem('typeOfDisability', data.typeOfDisability);
 				localStorage.setItem('userType', data.userType);
 				localStorage.setItem('token', data.token);
+				window.location.href='./evaluator.html';
 			}
 
 			resetFields();

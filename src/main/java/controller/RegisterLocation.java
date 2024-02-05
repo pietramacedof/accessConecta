@@ -77,12 +77,13 @@ public class RegisterLocation extends HttpServlet {
 		if (establishmentType.equalsIgnoreCase("restaurant")) {
 			String cuisineType = request.getParameter("cuisineType");
 			String operatingDays = request.getParameter("operatingDays");
-
+			
 			Restaurant restaurant = new Restaurant(street, neighborhood, city, state, locationName, postalCode, number,
 					cuisineType, operatingDays);
 			System.out.println(restaurant.getCep() + restaurant.getTypeOfCuisine());
-			dao.insertRestaurant(restaurant, owner);
-			String jsonResponse = "{\"status\": \"success\", \"message\": \"Operação bem-sucedida\"}";
+			int id = dao.insertRestaurant(restaurant, owner);
+			System.out.println(id);
+			String jsonResponse = "{\"status\": \"success\", \"message\": \"Operação bem-sucedida\", \"locationId\": " + id + "}";
 			out.println(jsonResponse);
 		} else if (establishmentType.equalsIgnoreCase("event")) {
 			String startDateStr = request.getParameter("startDate");
@@ -108,8 +109,9 @@ public class RegisterLocation extends HttpServlet {
 			Event event = new Event(street, neighborhood, city, state, locationName, postalCode, number, startDate,
 					endDate, eventPrice);
 			System.out.println(event.getCep() + event.getEventPrice());
-			dao.insertEvent(event, owner);
-			String jsonResponse = "{\"status\": \"success\", \"message\": \"Operação bem-sucedida\"}";
+			int id = dao.insertEvent(event, owner);
+			System.out.println(id);
+			String jsonResponse = "{\"status\": \"success\", \"message\": \"Operação bem-sucedida\", \"locationId\": " + id + "}";
 			out.println(jsonResponse);
 
 		} else {
@@ -118,8 +120,8 @@ public class RegisterLocation extends HttpServlet {
 			Store store = new Store(street, neighborhood, city, state, locationName, postalCode, number, productType);
 
 			System.out.println(store.getCep() + store.getTypeProduct());
-			dao.insertStore(store, owner);
-			String jsonResponse = "{\"status\": \"success\", \"message\": \"Operação bem-sucedida\"}";
+			int id = dao.insertStore(store, owner);
+			String jsonResponse = "{\"status\": \"success\", \"message\": \"Operação bem-sucedida\", \"locationId\": " + id + "}";
 			out.println(jsonResponse);
 		}
 	}

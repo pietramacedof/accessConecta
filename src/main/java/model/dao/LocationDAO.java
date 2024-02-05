@@ -5,6 +5,7 @@ import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.sql.ResultSet;
@@ -34,14 +35,15 @@ public class LocationDAO {
 		}
 	}
 
-	public void insertRestaurant(Restaurant restaurant, Owner owner) {
+	public int insertRestaurant(Restaurant restaurant, Owner owner) {
 		String sql = "INSERT INTO location (location_user_id, location_public_place, location_neighborhood, location_city, location_uf,"
 				+ "location_place_name, location_cep, location_place_number, location_type, location_type_of_cuisine, location_operating_days) VALUES"
 				+ " (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-		System.out.println("oi");
+
 		try {
 			Connection conn = toConnect();
-			PreparedStatement pstmt = conn.prepareStatement(sql);
+			PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+
 			pstmt.setInt(1, owner.getId());
 			pstmt.setString(2, restaurant.getPublicPlace());
 			pstmt.setString(3, restaurant.getNeighborhood());
@@ -55,37 +57,47 @@ public class LocationDAO {
 			pstmt.setString(11, restaurant.getOperatingDays());
 
 			int affectedRows = pstmt.executeUpdate();
+
 			if (affectedRows == 0) {
 				throw new SQLException("Erro ao inserir o restaurante.");
 			}
+
+			ResultSet generatedKeys = pstmt.getGeneratedKeys();
+			if (generatedKeys.next()) {
+				return generatedKeys.getInt(1); // Retorna o ID gerado pelo banco de dados
+			} else {
+				throw new SQLException("Erro ao obter o ID gerado pelo banco de dados.");
+			}
 		} catch (SQLException e) {
 			System.out.println(e);
+			return -1; // Ou outro valor que indique falha
 		}
 	}
-	
-    public boolean deleteLocation(String id) {
-        try (Connection conn = toConnect()) {
-            String sql = "DELETE FROM location WHERE location_id = ?";
-            
-            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-                pstmt.setString(1, id);
 
-                int rowsAffected = pstmt.executeUpdate();
+	public boolean deleteLocation(String id) {
+		try (Connection conn = toConnect()) {
+			String sql = "DELETE FROM location WHERE location_id = ?";
 
-                return rowsAffected > 0; // Retorna true se pelo menos uma linha foi afetada (excluída)
-            }
-        } catch (SQLException e) {
-            e.printStackTrace(); // Lida com exceções de SQL, substitua por um tratamento apropriado
-            return false;
-        }
-    }
-	public void insertEvent(Event event, Owner owner) {
+			try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+				pstmt.setString(1, id);
+
+				int rowsAffected = pstmt.executeUpdate();
+
+				return rowsAffected > 0; // Retorna true se pelo menos uma linha foi afetada (excluída)
+			}
+		} catch (SQLException e) {
+			e.printStackTrace(); // Lida com exceções de SQL, substitua por um tratamento apropriado
+			return false;
+		}
+	}
+
+	public int insertEvent(Event event, Owner owner) {
 		String sql = "INSERT INTO location (location_user_id, location_public_place, location_neighborhood, location_city, location_uf,"
 				+ "location_place_name, location_cep, location_place_number, location_type, location_start_date, location_end_date, location_event_price) VALUES"
 				+ " (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		try {
 			Connection conn = toConnect();
-			PreparedStatement pstmt = conn.prepareStatement(sql);
+			PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 			pstmt.setInt(1, owner.getId());
 			pstmt.setString(2, event.getPublicPlace());
 			pstmt.setString(3, event.getNeighborhood());
@@ -106,19 +118,26 @@ public class LocationDAO {
 			if (affectedRows == 0) {
 				throw new SQLException("Erro ao inserir o evento.");
 			}
+			ResultSet generatedKeys = pstmt.getGeneratedKeys();
+			if (generatedKeys.next()) {
+				return generatedKeys.getInt(1); // Retorna o ID gerado pelo banco de dados
+			} else {
+				throw new SQLException("Erro ao obter o ID gerado pelo banco de dados.");
+			}
 		} catch (SQLException e) {
 			System.out.println(e);
+			return -1;
 		}
 	}
 
-	public void insertStore(Store store, Owner owner) {
+	public int insertStore(Store store, Owner owner) {
 		String sql = "INSERT INTO location (location_user_id, location_public_place, location_neighborhood, location_city, location_uf,"
 				+ "location_place_name, location_cep, location_place_number, location_type, location_type_product) VALUES"
 				+ " (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 		try {
 			Connection conn = toConnect();
-			PreparedStatement pstmt = conn.prepareStatement(sql);
+			PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 			pstmt.setInt(1, owner.getId());
 			pstmt.setString(2, store.getPublicPlace());
 			pstmt.setString(3, store.getNeighborhood());
@@ -134,8 +153,15 @@ public class LocationDAO {
 			if (affectedRows == 0) {
 				throw new SQLException("Erro ao inserir a loja.");
 			}
+			ResultSet generatedKeys = pstmt.getGeneratedKeys();
+			if (generatedKeys.next()) {
+				return generatedKeys.getInt(1); // Retorna o ID gerado pelo banco de dados
+			} else {
+				throw new SQLException("Erro ao obter o ID gerado pelo banco de dados.");
+			}
 		} catch (SQLException e) {
 			System.out.println(e);
+			return -1;
 		}
 	}
 
@@ -155,11 +181,11 @@ public class LocationDAO {
 		}
 		return false;
 	}
-	
-	public boolean existLocationAlter(String id, String postalCode, String street, String number, String city, String state) {
+
+	public boolean existLocationAlter(String id, String postalCode, String street, String number, String city,
+			String state) {
 		String sql = "SELECT COUNT(*) FROM location WHERE location_city = ? AND location_uf = ? AND location_cep = ?"
-				+ " AND location_place_number = ? AND location_public_place = ? AND location_id != ?"
-				;
+				+ " AND location_place_number = ? AND location_public_place = ? AND location_id != ?";
 		boolean locationExists = false;
 		try (Connection conn = toConnect()) {
 			try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -184,113 +210,93 @@ public class LocationDAO {
 
 		return locationExists;
 	}
-	
+
 	public boolean updateEvent(Event e) {
-	    String sql = "UPDATE location SET " +
-	            "location_city = ?, " +
-	            "location_uf = ?, " +
-	            "location_cep = ?, " +
-	            "location_place_number = ?, " +
-	            "location_public_place = ?, " +
-	            "location_start_date = ?, " +
-	            "location_end_date = ?, " +
-	            "location_place_name = ? " + 
-	            "WHERE location_id = ?";
+		String sql = "UPDATE location SET " + "location_city = ?, " + "location_uf = ?, " + "location_cep = ?, "
+				+ "location_place_number = ?, " + "location_public_place = ?, " + "location_start_date = ?, "
+				+ "location_end_date = ?, " + "location_place_name = ? " + "WHERE location_id = ?";
 
-	    try (Connection connection = toConnect();
-	         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+		try (Connection connection = toConnect();
+				PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
-	        // Set the values for the placeholders in the SQL statement
-	        preparedStatement.setString(1, e.getCity());
-	        preparedStatement.setString(2, e.getUf());
-	        preparedStatement.setString(3, e.getCep());
-	        preparedStatement.setString(4, e.getNumber());
-	        preparedStatement.setString(5, e.getPublicPlace());
-	        preparedStatement.setDate(6, (Date) e.getStartDate());
-	        preparedStatement.setDate(7, (Date) e.getEndDate());
-	        preparedStatement.setString(8, e.getPlaceName());
-	        preparedStatement.setString(9, e.getId());
+			// Set the values for the placeholders in the SQL statement
+			preparedStatement.setString(1, e.getCity());
+			preparedStatement.setString(2, e.getUf());
+			preparedStatement.setString(3, e.getCep());
+			preparedStatement.setString(4, e.getNumber());
+			preparedStatement.setString(5, e.getPublicPlace());
+			preparedStatement.setDate(6, (Date) e.getStartDate());
+			preparedStatement.setDate(7, (Date) e.getEndDate());
+			preparedStatement.setString(8, e.getPlaceName());
+			preparedStatement.setString(9, e.getId());
 
-	        int rowsUpdated = preparedStatement.executeUpdate();
+			int rowsUpdated = preparedStatement.executeUpdate();
 
-	        return rowsUpdated > 0;
+			return rowsUpdated > 0;
 
-	    } catch (SQLException ex) {
-	        ex.printStackTrace(); // Handle the exception appropriately based on your application's requirements
-	        return false;
-	    }
+		} catch (SQLException ex) {
+			ex.printStackTrace(); // Handle the exception appropriately based on your application's requirements
+			return false;
+		}
 	}
-	
+
 	public boolean updateStore(Store s) {
-	    String sql = "UPDATE location SET " +
-	            "location_city = ?, " +
-	            "location_uf = ?, " +
-	            "location_cep = ?, " +
-	            "location_place_number = ?, " +
-	            "location_public_place = ?, " +
-	            "location_type_product = ?, " +
-	            "location_place_name = ? " + 
-	            "WHERE location_id = ?";
+		String sql = "UPDATE location SET " + "location_city = ?, " + "location_uf = ?, " + "location_cep = ?, "
+				+ "location_place_number = ?, " + "location_public_place = ?, " + "location_type_product = ?, "
+				+ "location_place_name = ? " + "WHERE location_id = ?";
 
-	    try (Connection connection = toConnect();
-	         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+		try (Connection connection = toConnect();
+				PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
-	        // Set the values for the placeholders in the SQL statement
-	        preparedStatement.setString(1, s.getCity());
-	        preparedStatement.setString(2, s.getUf());
-	        preparedStatement.setString(3, s.getCep());
-	        preparedStatement.setString(4, s.getNumber());
-	        preparedStatement.setString(5, s.getPublicPlace());
-	        preparedStatement.setString(6, s.getTypeProduct());
-	        preparedStatement.setString(7, s.getPlaceName());
-	        preparedStatement.setString(8, s.getId());
+			// Set the values for the placeholders in the SQL statement
+			preparedStatement.setString(1, s.getCity());
+			preparedStatement.setString(2, s.getUf());
+			preparedStatement.setString(3, s.getCep());
+			preparedStatement.setString(4, s.getNumber());
+			preparedStatement.setString(5, s.getPublicPlace());
+			preparedStatement.setString(6, s.getTypeProduct());
+			preparedStatement.setString(7, s.getPlaceName());
+			preparedStatement.setString(8, s.getId());
 
-	        int rowsUpdated = preparedStatement.executeUpdate();
+			int rowsUpdated = preparedStatement.executeUpdate();
 
-	        return rowsUpdated > 0;
+			return rowsUpdated > 0;
 
-	    } catch (SQLException ex) {
-	        ex.printStackTrace(); // Handle the exception appropriately based on your application's requirements
-	        return false;
-	    }
+		} catch (SQLException ex) {
+			ex.printStackTrace(); // Handle the exception appropriately based on your application's requirements
+			return false;
+		}
 	}
 
-	
-	  public boolean updateRestaurant(Restaurant r) {
-	        String sql = "UPDATE location SET " +
-	                "location_city = ?, " +
-	                "location_uf = ?, " +
-	                "location_cep = ?, " +
-	                "location_place_number = ?, " +
-	                "location_public_place = ?, " +
-	                "location_type_of_cuisine = ?, " +
-	                "location_operating_days = ?, " +  // Add a comma here
-	                "location_place_name = ? " + 
-	                "WHERE location_id = ?";
+	public boolean updateRestaurant(Restaurant r) {
+		String sql = "UPDATE location SET " + "location_city = ?, " + "location_uf = ?, " + "location_cep = ?, "
+				+ "location_place_number = ?, " + "location_public_place = ?, " + "location_type_of_cuisine = ?, "
+				+ "location_operating_days = ?, " + // Add a comma here
+				"location_place_name = ? " + "WHERE location_id = ?";
 
-	        try (Connection connection = toConnect();
-	             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+		try (Connection connection = toConnect();
+				PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
-	            // Set the values for the placeholders in the SQL statement
-	            preparedStatement.setString(1, r.getCity());
-	            preparedStatement.setString(2, r.getUf());
-	            preparedStatement.setString(3, r.getCep());
-	            preparedStatement.setString(4, r.getNumber());
-	            preparedStatement.setString(5, r.getPublicPlace());
-	            preparedStatement.setString(6, r.getTypeOfCuisine());
-	            preparedStatement.setString(7, r.getOperatingDays());
-	            preparedStatement.setString(8, r.getPlaceName());
-	            preparedStatement.setString(9, r.getId());
+			// Set the values for the placeholders in the SQL statement
+			preparedStatement.setString(1, r.getCity());
+			preparedStatement.setString(2, r.getUf());
+			preparedStatement.setString(3, r.getCep());
+			preparedStatement.setString(4, r.getNumber());
+			preparedStatement.setString(5, r.getPublicPlace());
+			preparedStatement.setString(6, r.getTypeOfCuisine());
+			preparedStatement.setString(7, r.getOperatingDays());
+			preparedStatement.setString(8, r.getPlaceName());
+			preparedStatement.setString(9, r.getId());
 
-	            int rowsUpdated = preparedStatement.executeUpdate();
+			int rowsUpdated = preparedStatement.executeUpdate();
 
-	            return rowsUpdated > 0;
+			return rowsUpdated > 0;
 
-	        } catch (SQLException e) {
-	            e.printStackTrace(); // Handle the exception appropriately based on your application's requirements
-	            return false;
-	        }
-	    }
+		} catch (SQLException e) {
+			e.printStackTrace(); // Handle the exception appropriately based on your application's requirements
+			return false;
+		}
+	}
 
 	public boolean existLocation(String postalCode, String street, String number, String city, String state) {
 		String sql = "SELECT COUNT(*) FROM location WHERE location_city = ? AND location_uf = ? AND location_cep = ? AND location_place_number = ? "
@@ -342,7 +348,8 @@ public class LocationDAO {
 	}
 
 	private Location createLocationFromResultSet(ResultSet resultSet) throws SQLException {
-		String type = resultSet.getString("location_type"); // Supondo que há uma coluna 'type' que indica o tipo de local
+		String type = resultSet.getString("location_type"); // Supondo que há uma coluna 'type' que indica o tipo de
+															// local
 
 		Location location;
 
@@ -362,68 +369,45 @@ public class LocationDAO {
 
 		return location;
 	}
-	
+
 	private Restaurant createRestaurantFromResultSet(ResultSet resultSet) throws SQLException {
-	    // Extrair atributos específicos de Restaurant do ResultSet
-	    String typeOfCuisine = resultSet.getString("location_type_of_cuisine");
-	    String operatingDays = resultSet.getString("location_operating_days");
+		// Extrair atributos específicos de Restaurant do ResultSet
+		String typeOfCuisine = resultSet.getString("location_type_of_cuisine");
+		String operatingDays = resultSet.getString("location_operating_days");
 
-	    // Criar e retornar um objeto Restaurant
-	    return new Restaurant(
-	    		resultSet.getString("location_id"),
-	            resultSet.getString("location_public_place"),
-	            resultSet.getString("location_neighborhood"),
-	            resultSet.getString("location_city"),
-	            resultSet.getString("location_uf"),
-	            resultSet.getString("location_place_name"),
-	            resultSet.getString("location_cep"),
-	            resultSet.getString("location_place_number"),
-	            typeOfCuisine,
-	            operatingDays
-	    );
+		// Criar e retornar um objeto Restaurant
+		return new Restaurant(resultSet.getString("location_id"), resultSet.getString("location_public_place"),
+				resultSet.getString("location_neighborhood"), resultSet.getString("location_city"),
+				resultSet.getString("location_uf"), resultSet.getString("location_place_name"),
+				resultSet.getString("location_cep"), resultSet.getString("location_place_number"), typeOfCuisine,
+				operatingDays);
 	}
-	
+
 	private Event createEventFromResultSet(ResultSet resultSet) throws SQLException {
-	    // Extrair atributos específicos de Event do ResultSet
-	    // Você pode precisar converter os valores de data do banco de dados para objetos Date aqui
-	    Date startDate = resultSet.getDate("location_start_date");
-	    Date endDate = resultSet.getDate("location_end_date");
-	    String eventPrice = resultSet.getString("location_event_price");
+		// Extrair atributos específicos de Event do ResultSet
+		// Você pode precisar converter os valores de data do banco de dados para
+		// objetos Date aqui
+		Date startDate = resultSet.getDate("location_start_date");
+		Date endDate = resultSet.getDate("location_end_date");
+		String eventPrice = resultSet.getString("location_event_price");
 
-	    // Criar e retornar um objeto Event
-	    return new Event(
-	    		resultSet.getString("location_id"),
-	    		resultSet.getString("location_public_place"),
-	            resultSet.getString("location_neighborhood"),
-	            resultSet.getString("location_city"),
-	            resultSet.getString("location_uf"),
-	            resultSet.getString("location_place_name"),
-	            resultSet.getString("location_cep"),
-	            resultSet.getString("location_place_number"),
-	            startDate,
-	            endDate,
-	            eventPrice
-	    );
+		// Criar e retornar um objeto Event
+		return new Event(resultSet.getString("location_id"), resultSet.getString("location_public_place"),
+				resultSet.getString("location_neighborhood"), resultSet.getString("location_city"),
+				resultSet.getString("location_uf"), resultSet.getString("location_place_name"),
+				resultSet.getString("location_cep"), resultSet.getString("location_place_number"), startDate, endDate,
+				eventPrice);
 	}
-	
-	
-	
-	private Store createStoreFromResultSet(ResultSet resultSet) throws SQLException {
-	    // Extrair atributos específicos de Store do ResultSet
-	    String typeProduct = resultSet.getString("location_type_product");
 
-	    // Criar e retornar um objeto Store
-	    return new Store(
-	    		resultSet.getString("location_id"),
-	    		resultSet.getString("location_public_place"),
-	            resultSet.getString("location_neighborhood"),
-	            resultSet.getString("location_city"),
-	            resultSet.getString("location_uf"),
-	            resultSet.getString("location_place_name"),
-	            resultSet.getString("location_cep"),
-	            resultSet.getString("location_place_number"),
-	            typeProduct
-	    );
+	private Store createStoreFromResultSet(ResultSet resultSet) throws SQLException {
+		// Extrair atributos específicos de Store do ResultSet
+		String typeProduct = resultSet.getString("location_type_product");
+
+		// Criar e retornar um objeto Store
+		return new Store(resultSet.getString("location_id"), resultSet.getString("location_public_place"),
+				resultSet.getString("location_neighborhood"), resultSet.getString("location_city"),
+				resultSet.getString("location_uf"), resultSet.getString("location_place_name"),
+				resultSet.getString("location_cep"), resultSet.getString("location_place_number"), typeProduct);
 	}
 
 }

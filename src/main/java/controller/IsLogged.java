@@ -40,7 +40,7 @@ public class IsLogged extends HttpServlet {
 			System.out.println(jsonResponse);
 			out.println(jsonResponse);
 		} else {
-			String jsonResponse = "{\"status\": \"error\", \"message\": \"Operação bem-sucedida\"}";
+			String jsonResponse = "{\"status\": \"error\", \"message\": \"Operação mal-sucedida\"}";
 			System.out.println(jsonResponse);
 			out.println(jsonResponse);
 		}
