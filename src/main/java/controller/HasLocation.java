@@ -50,8 +50,9 @@ public class HasLocation extends HttpServlet {
 			// cadastrado
 			Owner owner = dao.findOwnerByToken(token);
 			if (owner != null && ldao.hasLocation(owner.getId())) {
-				List<Location> locations = ldao.consultLocations(owner.getId());
-				String jsonResponse = buildJsonResponse("success", "Usuário possui locais cadastrados", convertLocationsToJson(locations));
+				Location l = new Location();
+				owner.setLocations(l.consultLocationsByOwner(owner.getId())); 
+				String jsonResponse = buildJsonResponse("success", "Usuário possui locais cadastrados", convertLocationsToJson(owner.getLocations()));
 				System.out.println(jsonResponse);
 		        out.println(jsonResponse);
 			} else {
@@ -90,10 +91,15 @@ public class HasLocation extends HttpServlet {
 	        } else {
 	            first = false;
 	        }
+	        
+	        double note = location.getAcessibilityNote();
+	        String formattedNote = String.format("%.2f", note); // Format to 2 decimal places
+	       
 
 	        jsonBuilder.append("{")
 	            .append("\"id\":" + location.getId() + ",")
 	            .append("\"publicPlace\":\"" + escapeJsonString(location.getPublicPlace()) + "\",")
+	            .append("\"acessibilityNote\":\"" + escapeJsonString(formattedNote) + "\",")
 	            .append("\"neighborhood\":\"" + escapeJsonString(location.getNeighborhood()) + "\",")
 	            .append("\"city\":\"" + escapeJsonString(location.getCity()) + "\",")
 	            .append("\"uf\":\"" + escapeJsonString(location.getUf()) + "\",")
@@ -125,6 +131,7 @@ public class HasLocation extends HttpServlet {
 
 	    return jsonBuilder.toString();
 	}
+	
 
 	private static String escapeJsonString(String input) {
 	    if (input == null) {

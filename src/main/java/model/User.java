@@ -40,9 +40,6 @@ public class User {
 		this.userType = userType;
 	}
 	
-	
-	
-
 	public Integer getId() {
 		return id;
 	}

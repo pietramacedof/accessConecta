@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import model.Owner;
+import model.User;
 import model.UserDAO;
 
 import java.io.IOException;
@@ -32,18 +33,29 @@ public class IsLogged extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String authHeader = request.getHeader("Authorization");
 		String token = authHeader.substring(7);
-		Owner owner = dao.findOwnerByToken(token);
+		User user = new User();
+		user = user.findUserByToken(token);
 		response.setContentType("application/json;charset=UTF-8");
 		PrintWriter out = response.getWriter();
-		if(owner != null) {
-			String jsonResponse = "{\"status\": \"success\", \"message\": \"Operação bem-sucedida\"}";
-			System.out.println(jsonResponse);
-			out.println(jsonResponse);
+		System.out.println("Tipo:" + user.getUserType());
+		if(user != null) {
+			if(user.getUserType() == 1) {
+				System.out.println("Entrou no owner");
+				String jsonResponse = "{\"status\": \"success\", \"message\": \"Operação bem-sucedida\", \"userType\": " + user.getUserType() + "}";
+				System.out.println(jsonResponse);
+				out.println(jsonResponse);
+			}
+			else {
+				System.out.println("Entrou no evaluator");
+				String jsonResponse = "{\"status\": \"success\", \"message\": \"Operação bem-sucedida\", \"userType\": " + user.getUserType() + "}";
+				System.out.println(jsonResponse);
+				out.println(jsonResponse);
+			}
+			
 		} else {
 			String jsonResponse = "{\"status\": \"error\", \"message\": \"Operação mal-sucedida\"}";
 			System.out.println(jsonResponse);
 			out.println(jsonResponse);
 		}
 	}
-
 }

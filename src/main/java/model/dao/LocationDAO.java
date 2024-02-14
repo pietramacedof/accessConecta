@@ -1,6 +1,6 @@
 package model.dao;
 
-import java.sql.Connection;
+import java.sql.Connection; 
 import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -325,6 +325,26 @@ public class LocationDAO {
 		return locationExists;
 	}
 
+	public List<Location> consultAllLocations() {
+		List<Location> locations = new ArrayList<>();
+		Connection conn = toConnect();
+		try {
+			String query = "SELECT * FROM location";
+			try (PreparedStatement preparedStatement = conn.prepareStatement(query)) {
+
+				try (ResultSet resultSet = preparedStatement.executeQuery()) {
+					while (resultSet.next()) {
+						Location location = createLocationFromResultSet(resultSet);
+						locations.add(location);
+					}
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return locations;
+	}
+
 	public List<Location> consultLocations(int ownerId) {
 		List<Location> locations = new ArrayList<>();
 		Connection conn = toConnect();
@@ -378,6 +398,7 @@ public class LocationDAO {
 		// Criar e retornar um objeto Restaurant
 		return new Restaurant(resultSet.getString("location_id"), resultSet.getString("location_public_place"),
 				resultSet.getString("location_neighborhood"), resultSet.getString("location_city"),
+				resultSet.getDouble("location_acessibility_note"),
 				resultSet.getString("location_uf"), resultSet.getString("location_place_name"),
 				resultSet.getString("location_cep"), resultSet.getString("location_place_number"), typeOfCuisine,
 				operatingDays);
@@ -394,6 +415,7 @@ public class LocationDAO {
 		// Criar e retornar um objeto Event
 		return new Event(resultSet.getString("location_id"), resultSet.getString("location_public_place"),
 				resultSet.getString("location_neighborhood"), resultSet.getString("location_city"),
+				resultSet.getDouble("location_acessibility_note"),
 				resultSet.getString("location_uf"), resultSet.getString("location_place_name"),
 				resultSet.getString("location_cep"), resultSet.getString("location_place_number"), startDate, endDate,
 				eventPrice);
@@ -406,6 +428,7 @@ public class LocationDAO {
 		// Criar e retornar um objeto Store
 		return new Store(resultSet.getString("location_id"), resultSet.getString("location_public_place"),
 				resultSet.getString("location_neighborhood"), resultSet.getString("location_city"),
+				resultSet.getDouble("location_acessibility_note"),
 				resultSet.getString("location_uf"), resultSet.getString("location_place_name"),
 				resultSet.getString("location_cep"), resultSet.getString("location_place_number"), typeProduct);
 	}

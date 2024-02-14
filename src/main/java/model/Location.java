@@ -1,5 +1,7 @@
 package model;
 
+import java.util.List; 
+
 import model.dao.LocationDAO;
 
 public class Location {
@@ -7,12 +9,47 @@ public class Location {
 	private String publicPlace;
 	private String neighborhood;
 	private String city;
+	private double acessibilityNote;
 	private String uf;
 	private String placeName;
 	private String cep;
 	private String number;
 	
+	public List<Location> consultLocationsByOwner(int ownerId) {
+        LocationDAO dao = new LocationDAO();
+        return dao.consultLocations(ownerId);
+    }
+
+    public List<Location> consultAllLocations() {
+        LocationDAO dao = new LocationDAO();
+        // Supondo que o método consultAllLocations na DAO retorne uma lista de todas as locations
+        return dao.consultAllLocations();
+    }
 	
+	public boolean deleteLocation(String id) {
+		LocationDAO dao = new LocationDAO();
+		if(dao.deleteLocation(id)) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	public boolean isExist(Location location) {
+		LocationDAO dao = new LocationDAO();
+		if(dao.existLocationAlter(location.getId(), location.getCep(), location.getPublicPlace(), location.getNumber(), location.getCity(), location.getUf())) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	
+	public Location() {
+		
+	}
 	
 	public Location(String publicPlace, String neighborhood, String city, String uf, String placeName,
 			String cep, String number) {
@@ -24,9 +61,18 @@ public class Location {
 		this.cep = cep;
 		this.number = number;
 	}
-	
-	public Location() {
-		
+
+	public Location(String id, String publicPlace, String neighborhood, String city, double acessibilityNote, String uf, String placeName,
+			String cep, String number) {
+		this.id = id;
+		this.publicPlace = publicPlace;
+		this.neighborhood = neighborhood;
+		this.city = city;
+		this.acessibilityNote = acessibilityNote;
+		this.uf = uf;
+		this.placeName = placeName;
+		this.cep = cep;
+		this.number = number;
 	}
 	
 	public Location(String id, String publicPlace, String neighborhood, String city, String uf, String placeName,
@@ -39,28 +85,6 @@ public class Location {
 		this.placeName = placeName;
 		this.cep = cep;
 		this.number = number;
-	}
-	
-	public boolean deleteLocation(String id) {
-		LocationDAO dao = new LocationDAO();
-		if(dao.deleteLocation(id)) {
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
-	
-	
-	
-	public boolean isExist(Location location) {
-		LocationDAO dao = new LocationDAO();
-		if(dao.existLocationAlter(location.getId(), location.getCep(), location.getPublicPlace(), location.getNumber(), location.getCity(), location.getUf())) {
-			return true;
-		}
-		else {
-			return false;
-		}
 	}
 
 	public String getId() {
@@ -125,5 +149,14 @@ public class Location {
 
 	public void setNumber(String number) {
 		this.number = number;
+	}
+	
+
+	public double getAcessibilityNote() {
+		return acessibilityNote;
+	}
+
+	public void setAcessibilityNote(double acessibilityNote) {
+		this.acessibilityNote = acessibilityNote;
 	}
 }

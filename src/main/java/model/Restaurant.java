@@ -14,6 +14,13 @@ public class Restaurant extends Location{
 		this.operatingDays = operatingDays;
 	}
 	
+	public Restaurant(String id, String publicPlace, String neighborhood, String city, double acessibilityNote, String uf, String placeName,
+			String cep, String number, String typeOfCuisine, String operatingDays) {
+		super(id, publicPlace, neighborhood, city, acessibilityNote, uf, placeName, cep, number);
+		this.typeOfCuisine = typeOfCuisine;
+		this.operatingDays = operatingDays;
+	}
+	
 	public Restaurant(String id, String publicPlace, String neighborhood, String city, String uf, String placeName,
 			String cep, String number, String typeOfCuisine, String operatingDays) {
 		super(id, publicPlace, neighborhood, city, uf, placeName, cep, number);

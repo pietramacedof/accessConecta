@@ -2,9 +2,126 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AccessConecta</title>
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+	rel="stylesheet"
+	integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+	crossorigin="anonymous">
+<link rel="shortcut icon" href="assets/access-conecta-logo.png"
+	type="image/x-icon">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="assets/star-rating-svg.css">
+<script loading="async" defer
+	src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDgEPUDm1YFgRTEBquY0EcqyMMaT_RCtbE&callback=initMap"></script>
 </head>
 <body>
-	<h1>Hello, avaliador</h1>
+	<header id="header-owner">
+
+		<div class="owner-header" id="owner-header-d">
+			<div class="owner-header-container">
+				<div>
+					<img class="logo" id="logo-light"
+						src="assets/access-conecta-invert.png" style="display: none;"
+						alt="Logo"> <img class="logo" id="logo-dark"
+						src="assets/access-conecta.png" alt="Logo">
+				</div>
+				<div class="button-header">
+					<i id="lightModeIcon" class="fa-solid fa-sun"></i> <i
+						id="darkModeIcon" class="fa-solid fa-moon" style="display: none;"></i>
+					<button class="locations">Locais</button>
+					<div class="dropdown">
+						<button class="btn btn-secondary dropdown-toggle locations"
+							type="button" data-bs-toggle="dropdown" aria-expanded="false"
+							style="width: 50px;">
+							<i class="fa-solid fa-user"></i>
+						</button>
+						<ul class="dropdown-menu">
+							<li><a id="toAlterPasswordBtn" class="dropdown-item"
+								href="#">Alterar Senha</a></li>
+							<li><a class="dropdown-item" href="#">Deletar conta</a></li>
+							<li><a id="closeSession" class="dropdown-item" href="#"
+								style="color: red;">Sair</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</header>
+	<section id="hasLocationSection" class="section-owner"
+		style="display: none;">
+		<div class="filter">
+			<div class="dropdown">
+				<button class="btn btn-secondary dropdown-toggle" type="button"
+					data-bs-toggle="dropdown" aria-expanded="false" id="dropdownButton">
+					Filtrar Locais</button>
+				<ul class="dropdown-menu">
+					<li><a class="dropdown-item" id="filterRestaurant"
+						onClick="filterType('restaurant')" href="#">Restaurante</a></li>
+					<li><a class="dropdown-item" id="filterEvent"
+						onClick="filterType('event')" href="#">Evento</a></li>
+					<li><a class="dropdown-item" id="filterStore"
+						onClick="filterType('store')" href="#">Loja</a></li>
+					<li><a class="dropdown-item" id="filterEverthing" href="#">Todos</a></li>
+				</ul>
+			</div>
+		</div>
+		<div class="content-has-location" id="cardLocation"></div>
+	</section>
+
+	<div id="evaluateData" class="modal" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title"></h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+				</div>
+				<input type="hidden" id="idLocationHidden">
+				<div class="modal-body" id="questions">
+					
+				</div>
+				<div class="modal-footer">
+					<button id="radeButton" type="button" class="btn btn-primary">Deletar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<section class="footer">
+		<footer>
+			<div class="container-footer">
+				<div class="content-footer">
+					<img id="light-logo" src="assets/access-conecta-invert.png"
+						alt="Logo" style="display: none;"> <img id="dark-logo"
+						src="assets/access-conecta.png" alt="Logo">
+					<p>
+						Avalie e contribua sem esforço <br> para espaços acessíveis.
+					</p>
+					<p style="border-top: 1px solid #999999; padding-top: 15px;">
+						Copyright, AccessConecta 2023, Todos os direitos reservados.</p>
+				</div>
+			</div>
+		</footer>
+	</section>
+
+	<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+	<script src="assets/jquery.star-rating-svg.js"></script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"
+		integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh"
+		crossorigin="anonymous"></script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+		crossorigin="anonymous"></script>
+		<script src="script.js"></script>
+		<script src="locationData.js"></script>
 </body>
+
+
 </html>

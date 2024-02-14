@@ -3,14 +3,14 @@
 $(document).ready(function() {
 
 	const isLogged = localStorage.getItem('token');
-
+	
 	if (!isLogged) {
 		localStorage.clear();
 		window.location.href = './';
+		console.log('tá logado' , isLogged);
 		return;
 	}
 	$('.pageload').show();
-
 	axios.get('./isLogged', {
 		headers: {
 			Authorization: `Bearer ${isLogged}`
@@ -21,7 +21,16 @@ $(document).ready(function() {
 			window.location.href = './';
 		}
 		else {
-			checkUserHasLocation(isLogged);
+			if(response.data.userType == 1){
+				console.log('Tipo de usuario: ', response.data.userType);
+				checkUserHasLocation(isLogged);
+			}
+			else {
+				console.log('Tipo de usuario: ', response.data.userType);
+				loadLocations();
+			}
+
+			
 		}
 	}).catch((error) => {
 		console.error(error);
@@ -46,7 +55,15 @@ $(document).ready(function() {
 		e.preventDefault();
 		console.log("click")
 		$('#liveToast').toast('show');
-	})
+	});
+
+	$('#radeButton').on('click', function () {
+	var v = $('#idLocationHidden').val();
+	console.log(v);
+	var questionList = (localStorage.getItem('questionList'));
+	console.log('questionList', questionList);
+	console.log(questionList[0]);
+	var answersList;
 });
 
 function sendToast(status, message) {
@@ -379,14 +396,21 @@ function renderLocations(location, address, mapContainerId, isUpdate) {
 		template = `
 			
 				<div class="header-location-info" id="nameLocal">
-					<h2>${location.placeName}</h2><i class="fa-solid fa-utensils customIconUtensils"></i>
+					<h2>${location.placeName}</h2>
+					<i class="fa-solid fa-utensils customIconUtensils"></i>
 				</div>
 				<div class="content-location-info" id='infoLocal'>
 					<p><strong>Endereço:</strong> ${address}</p>
 					<p><strong>Dias de Abertura:</strong> ${location.operatingDays}</p>
+					<div>
+					<p><strong> Nota: </strong></p>
+					<div>
+						<div class="my-rating-${mapContainerId}"></div>
+					</div>
+					</div>
 				</div>
 				<!-- Adicione um contêiner para o mapa com um ID exclusivo -->
-				<div id="9" class="map-container" style="height: 200px;"></div>
+				<div id="${mapContainerId}" class="map-container" style="height: 200px;"></div>
 				<div class="btn-section">
 					<button class="btn btn-primary" onClick="editLocal(${mapContainerId})">Editar</button><button class="btn btn-danger" onClick="deleteLocal(${mapContainerId})">Deletar</button>
 				</div>
@@ -398,7 +422,9 @@ function renderLocations(location, address, mapContainerId, isUpdate) {
 		startDateFormate = formateDate(location.startDate);
 		endDateFormate = formateDate(location.endDate);
 		template = `
-        	<div class="header-location-info" id="nameLocal"><h2>${location.placeName}</h2><i class="fa-solid fa-champagne-glasses customIconChampagne"></i>
+        	<div class="header-location-info" id="nameLocal"><h2>${location.placeName}</h2>
+			<div class="my-rating-${mapContainerId}"></div>
+			<i class="fa-solid fa-champagne-glasses customIconChampagne"></i>
         	</div>
             <div class="content-location-info" id='infoLocal'>
             <p><strong>Endereço:</strong> ${address}</p>
@@ -416,7 +442,9 @@ function renderLocations(location, address, mapContainerId, isUpdate) {
 		template = 
 		`
         	
-        	<div class="header-location-info" id="nameLocal"><h2>${location.placeName}</h2><i class="fa-solid fa-store customIconStore"></i>
+        	<div class="header-location-info" id="nameLocal"><h2>${location.placeName}</h2>
+			<div class="my-rating-${mapContainerId}"></div>
+			<i class="fa-solid fa-store customIconStore"></i>
         	</div>
             <div class="content-location-info" id='infoLocal'>
             <p><strong>Endereço:</strong> ${address}</p>
@@ -432,7 +460,7 @@ function renderLocations(location, address, mapContainerId, isUpdate) {
         `;
 		
 	}
-	console.log(location, template)
+	inicializeStars(`.my-rating-${mapContainerId}`, location.acessibilityNote);
 	initMap(address, mapContainerId);
 	if(isUpdate){
 		$(`#locationInfo-${customId}`).html(template);
@@ -440,6 +468,21 @@ function renderLocations(location, address, mapContainerId, isUpdate) {
 	}
 	$('#hasLocation').append(`<div id="locationInfo-${customId}" class="location-info">${template}</div>`);
 		
+}
+
+function inicializeStars(id, note){
+	setTimeout(()=>{
+	var numeroAleatorio = Math.random();
+    var valorDesejado = Math.floor(numeroAleatorio *  4) +  1;
+	$(id).starRating({
+	initialRating: note,
+	readOnly: true,
+	strokeColor: '#894A00',
+	strokeWidth: 10,
+	starSize: 25
+});	
+	},100)
+  
 }
 
 function editLocal(id) {
@@ -566,7 +609,7 @@ function customCloseModal(id) {
 	};
 	  
 var updateData =     {
-        "id": 96,
+        "id": id,
         "placeName": locationName,
         "type": type,
     };
@@ -609,6 +652,7 @@ var queryString = Object.keys(data).map(key => key + '=' + encodeURIComponent(da
 			}
 			resetFields();
 			sendToast(result.status, result.message);
+		    console.log("Type: ", updateData.productType);
 			renderLocations(updateData, address, id, true)
 			customCloseModal('editData');
 			
@@ -680,7 +724,7 @@ function sendDeleteLocal(id) {
 function checkUserHasLocation(token) {
 	console.log('checando locais');
 	$('.pageload').show();
-	return axios.get('./hasLocation', {
+	return axios.get('./hasLocation',  {
 		headers: {
 			'Authorization': `Bearer ${token}`
 		}
@@ -745,12 +789,12 @@ function initMap(address, mapContainerId) {
 				draggable: false,
 			});
 
-			map.addListener('tilesloaded', function() {
-				const mapElements = document.querySelectorAll(`#${mapContainerId} .gm-style-cc`);
-				mapElements.forEach(function(element) {
-					element.style.display = 'none';
-				});
-			});
+			// map.addListener('tilesloaded', function() {
+			// 	const mapElements = document.querySelectorAll(`#${mapContainerId} .gm-style-cc`);
+			// 	mapElements.forEach(function(element) {
+			// 		element.style.display = 'none';
+			// 	});
+			// });
 
 			const marker = new google.maps.Marker({
 				position: locationLatLng,
@@ -799,6 +843,178 @@ document.getElementById('closeSession').addEventListener('click', function() {
 	
 });
 
+function loadLocations() {
+	console.log('loadLocations');
+	var apiUrl = './registerLocation';
+	axios.get(apiUrl)
+    .then(response => {
+        var result = response.data;
+        console.log(result);
+		$('#hasLocationSection').show();
+		if (response.data.status == "success") {
+				localStorage.setItem('locations', JSON.stringify(response.data.locations));
+				const locations = response.data.locations;
+				
+				setTimeout(function() {
+
+
+					locations.map((location, index) => {
+
+
+
+						var address = `${location.publicPlace}, ${location.number}, ${location.neighborhood}, ${location.city}, ${location.uf}`;
+
+						renderLocationsEvaluator(location, address, location.id);
+						return;
+					})
+				}, 2000);
+				
+
+				return;
+			}
+		
+		
+    })
+    .catch(error => {
+        console.error(error);
+    })
+    .finally(() => {
+        $('.pageload').hide();
+    });
+}
+
+function renderLocationsEvaluator(location, address, mapContainerId) {
+	console.log('RenderLocationsEvaluator');
+	console.log(address);
+    const customId = mapContainerId;
+    var template = '';
+    var buttons = '';
+
+    if (location.type == 'restaurant') {
+		console.log('IF');
+        template = `
+            <div class="header-location-info" id="nameLocal">
+                <h2>${location.placeName}</h2>
+				<div class="my-rating-${mapContainerId}"></div>
+                <i class="fa-solid fa-utensils customIconUtensils"></i>
+            </div>
+            <div class="content-location-info" id='infoLocal'>
+                <p><strong>Endereço:</strong> ${address}</p>
+                <p><strong>Dias de Abertura:</strong> ${location.operatingDays}</p>
+            </div>
+            <!-- Adicione um contêiner para o mapa com um ID exclusivo -->
+            <div id="${mapContainerId}" class="map-container" style="height: 200px;"></div>
+            <div class="btn-section">
+                <button class="btn btn-primary" onClick="evaluateLocation(${mapContainerId})">Avaliar</button>
+                <button class="btn btn-info" onClick="learnMore(${mapContainerId})">Saiba mais</button>
+            </div>
+        `;
+    }
+    else if (location.type == 'event') {
+		startDateFormate = formateDate(location.startDate);
+		endDateFormate = formateDate(location.endDate);
+        template = `
+            <div class="header-location-info" id="nameLocal">
+                <h2>${location.placeName}</h2>
+				<div class="my-rating-${mapContainerId}"></div>
+                <i class="fa-solid fa-champagne-glasses customIconChampagne"></i>
+            </div>
+            <div class="content-location-info" id='infoLocal'>
+                <p><strong>Endereço: </strong> ${address}</p>
+				<p><strong>Data de Início:</strong> ${startDateFormate}</p>
+	            <p><strong>Data de Fim:</strong> ${endDateFormate}</p>
+            </div>
+            <!-- Adicione um contêiner para o mapa com um ID exclusivo -->
+            <div id="${mapContainerId}" class="map-container" style="height: 200px;"></div>
+            <div class="btn-section">
+                <button class="btn btn-primary" onClick="evaluateLocation(${mapContainerId})">Avaliar</button>
+                <button class="btn btn-info" onClick="learnMore(${mapContainerId})">Saiba mais</button>
+            </div>
+        `;
+    }
+    else {
+        template = 
+		`
+        	<div class="header-location-info" id="nameLocal"><h2>${location.placeName}</h2>
+			<div class="my-rating-${mapContainerId}"></div>
+			<i class="fa-solid fa-store customIconStore"></i>
+        	</div>
+            <div class="content-location-info" id='infoLocal'>
+            <p><strong>Endereço:</strong> ${address}</p>
+            <p><strong>Tipo de Produto:</strong> ${location.typeProduct}</p>
+            </div>
+			<!-- Adicione um contêiner para o mapa com um ID exclusivo -->
+            <div id="${mapContainerId}" class="map-container" style="height: 200px;"></div>
+            <div class="btn-section">
+                <button class="btn btn-primary" onClick="evaluateLocation(${mapContainerId})">Avaliar</button>
+                <button class="btn btn-info" onClick="learnMore(${mapContainerId})">Saiba mais</button>
+            </div>
+        `;
+    }
+
+    console.log(location, template);
+	inicializeStars(`.my-rating-${mapContainerId}`, location.acessibilityNote);
+	console.log(location.acessibilityNote);
+    initMap(address, mapContainerId);
+
+    $('#cardLocation').append(`<div id="locationInfo-${customId}" class="location-info">${template}</div>`);
+}
+
+function evaluateLocation(id){
+	
+	console.log(id);
+	
+	$('#idLocationHidden').val(id);
+	
+	let apiUrl = './standard';
+	
+	axios.get(apiUrl)
+	.then(response => {
+		$('#questions').html('');
+       
+		const myModal = document.getElementById('evaluateData');
+		
+		const bootstrapModal = new bootstrap.Modal(myModal);
+		bootstrapModal.show();
+		const modalTitle = document.querySelector('.modal-title');
+		const standardName = response.data[0].standard_name;
+		
+		modalTitle.textContent = standardName + ' - Avalie este local';
+		const questions = response.data[0].questions;
+		
+		const modalBody = document.querySelector('.modal-body');
+		var template = '';
+		var values = [];
+		questions.map((question, index) => {
+			values.push(question.question_id);
+			template += `<div>
+			<p>${index + 1}. ${question.question_text}<\p>
+			<div class="input-group mb-3">
+				<div class="input-group-text">
+					<input type='radio' id="answer-${question.question_id}-1" name="awnser-${question.question_id}" value="2"><label for="answer-${question.question_id}-1">Suficiente</label>
+				</div>
+				<div class="input-group-text">
+					<input type='radio' id="answer-${question.question_id}-2" name="answer-${question.question_id}" value="1"><label for="answer-${question.question_id}-2">Parcial</label>
+				</div>
+				<div class="input-group-text">
+					<input type='radio' id="answer-${question.question_id}-3" name="answer-${question.question_id}" value="0"><label for="answer-${question.question_id}-3">Insuficiente</label>
+				</div>
+			</div>
+			<\div>`;
+		})
+		localStorage.setItem('questionList', values);
+		console.log(template);
+		$('#questions').append(template);
+		
+    })
+    .catch(error => {
+        console.error(error);
+    })
+    .finally(() => {
+        $('.pageload').hide();
+    });
+	console.log("Entranndo na avaliação.");
+}
 
 
 
