@@ -20,9 +20,9 @@ public class Event extends Location{
 		this.eventPrice = eventPrice;
 	}
 	
-	public Event(String id, String publicPlace, String neighborhood, String city, double acessibilityNote, String uf, String placeName,
+	public Event(String id, String publicPlace, String neighborhood, String city, double acessibilityNote, Integer quantityOfEvaluation, String uf, String placeName,
 			String cep, String number, Date startDate, Date endDate, String eventPrice) {
-		super(id, publicPlace, neighborhood, city, acessibilityNote, uf, placeName, cep, number);
+		super(id, publicPlace, neighborhood, city, acessibilityNote, quantityOfEvaluation, uf, placeName, cep, number);
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.eventPrice = eventPrice;

@@ -1,6 +1,6 @@
 package model.dao;
 
-import java.sql.Connection; 
+import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -399,6 +399,7 @@ public class LocationDAO {
 		return new Restaurant(resultSet.getString("location_id"), resultSet.getString("location_public_place"),
 				resultSet.getString("location_neighborhood"), resultSet.getString("location_city"),
 				resultSet.getDouble("location_acessibility_note"),
+				resultSet.getInt("location_quantity_of_evaluation"),
 				resultSet.getString("location_uf"), resultSet.getString("location_place_name"),
 				resultSet.getString("location_cep"), resultSet.getString("location_place_number"), typeOfCuisine,
 				operatingDays);
@@ -415,7 +416,7 @@ public class LocationDAO {
 		// Criar e retornar um objeto Event
 		return new Event(resultSet.getString("location_id"), resultSet.getString("location_public_place"),
 				resultSet.getString("location_neighborhood"), resultSet.getString("location_city"),
-				resultSet.getDouble("location_acessibility_note"),
+				resultSet.getDouble("location_acessibility_note"), resultSet.getInt("location_quantity_of_evaluation"),
 				resultSet.getString("location_uf"), resultSet.getString("location_place_name"),
 				resultSet.getString("location_cep"), resultSet.getString("location_place_number"), startDate, endDate,
 				eventPrice);
@@ -428,9 +429,98 @@ public class LocationDAO {
 		// Criar e retornar um objeto Store
 		return new Store(resultSet.getString("location_id"), resultSet.getString("location_public_place"),
 				resultSet.getString("location_neighborhood"), resultSet.getString("location_city"),
-				resultSet.getDouble("location_acessibility_note"),
+				resultSet.getDouble("location_acessibility_note"), resultSet.getInt("location_quantity_of_evaluation"),
 				resultSet.getString("location_uf"), resultSet.getString("location_place_name"),
 				resultSet.getString("location_cep"), resultSet.getString("location_place_number"), typeProduct);
 	}
+
+	public Location consultLocationById(String id) throws SQLException {
+		Location location = null;
+		Connection connection = toConnect();
+		try (PreparedStatement statement = connection
+				.prepareStatement("SELECT * FROM location WHERE location_id = ?")) {
+			statement.setString(1, id);
+			try (ResultSet resultSet = statement.executeQuery()) {
+				if (resultSet.next()) {
+					// Aqui você usaria o método createLocationFromResultSet para construir o objeto
+					// Location
+					// com base nos dados obtidos do ResultSet.
+					location = createLocationFromResultSet(resultSet);
+				}
+			}
+		}
+		return location;
+	}
+
+	public boolean updateNoteById(Location location, double total, double convertedNote) {
+		String sql = "UPDATE location " + "SET location_acessibility_note = ?, location_quantity_of_evaluation = ?,"
+				+ "location_total_rating = ?"
+				+ "WHERE location_id = ?";
+		Connection connection = toConnect();
+		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+			preparedStatement.setDouble(1, location.getAcessibilityNote());
+			preparedStatement.setInt(2, location.getQuantityOfEvaluation());
+			preparedStatement.setDouble(3, (total+convertedNote));
+			preparedStatement.setString(4, location.getId());
+
+			int rowsUpdated = preparedStatement.executeUpdate();
+			return rowsUpdated > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	public void insertEvaluation(Integer userId, String locationId, double rating) throws SQLException {
+		  String sql = "INSERT INTO evaluation (evaluation_user_id, evaluation_location_id, evaluation_rating) VALUES (?, ?, ?)";
+		  try (Connection connection = toConnect();
+			   PreparedStatement statement = connection.prepareStatement(sql)) {
+		    statement.setInt(1, userId);
+		    statement.setString(2, locationId);
+		    statement.setDouble(3, rating);
+		    statement.executeUpdate();
+		  }
+	}
+	
+	public double getLocationTotalRatingById(String id) {
+		
+		  Connection connection = toConnect();
+
+		  PreparedStatement statement = null;
+		  ResultSet resultSet = null;
+
+		  try {
+		    
+		    String sql = "SELECT location_total_rating FROM location WHERE location_id = ?";
+
+		   
+		    statement = connection.prepareStatement(sql);
+		    statement.setString(1, id);
+		    resultSet = statement.executeQuery();
+
+		    // Verifique se algum registro foi encontrado
+		    if (resultSet.next()) {
+		      
+		      return resultSet.getDouble("location_total_rating");
+		    } else {
+		     
+		      return 0.0;
+		    }
+		  } catch (SQLException e) {
+		    
+		    e.printStackTrace();
+		    return 0.0; // Valor padrão em caso de erro
+		  } finally {
+		    
+		    try {
+		      if (resultSet != null) resultSet.close();
+		      if (statement != null) statement.close();
+		      if (connection != null) connection.close();
+		    } catch (SQLException e) {
+		      
+		      e.printStackTrace();
+		    }
+		  }
+		}
 
 }

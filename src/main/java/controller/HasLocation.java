@@ -16,6 +16,7 @@ import model.dao.LocationDAO;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.util.List;
 
 @WebServlet("/hasLocation")
@@ -36,6 +37,36 @@ public class HasLocation extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
 	 *      response)
 	 */
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		response.setContentType("application/json;charset=UTF-8");
+		PrintWriter out = response.getWriter();
+		String noteStr = request.getParameter("note");
+		double note = Double.parseDouble(noteStr);
+		String id = request.getParameter("id");
+		String token = request.getParameter("token");
+		User u = new User();
+		u = u.findUserByToken(token);
+		System.out.println(u.getId() + u.getFirstName());
+		Location location = new Location();
+		try {
+			if (location.checkerNote(note)) {
+				location = location.evaluateLocation(id, note, u);
+				double accessibilityNote = location.getAcessibilityNote();
+				String jsonResponse = "{ \"status\": \"success\", \"message\": \"Operação bem-sucedida.\", \"accessibilityNote\": \""
+						+ accessibilityNote + "\" }";
+				out.println(jsonResponse);
+			} else {
+				String jsonResponse = "{\"status\": \"error\", \"message\": \"Nota inválida.\"}";
+				out.println(jsonResponse);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		// Recupera o token do cabeçalho de autorização
@@ -51,10 +82,11 @@ public class HasLocation extends HttpServlet {
 			Owner owner = dao.findOwnerByToken(token);
 			if (owner != null && ldao.hasLocation(owner.getId())) {
 				Location l = new Location();
-				owner.setLocations(l.consultLocationsByOwner(owner.getId())); 
-				String jsonResponse = buildJsonResponse("success", "Usuário possui locais cadastrados", convertLocationsToJson(owner.getLocations()));
+				owner.setLocations(l.consultLocationsByOwner(owner.getId()));
+				String jsonResponse = buildJsonResponse("success", "Usuário possui locais cadastrados",
+						convertLocationsToJson(owner.getLocations()));
 				System.out.println(jsonResponse);
-		        out.println(jsonResponse);
+				out.println(jsonResponse);
 			} else {
 				// Se o usuário não tem nenhum local cadastrado, envia uma resposta com status
 				// 404
@@ -71,104 +103,96 @@ public class HasLocation extends HttpServlet {
 			writer.write("Autorização inválida.");
 		}
 	}
-	
+
 	private String buildJsonResponse(String status, String message, String locationsJson) {
-	    String jsonResponse = "{" +
-	        "\"status\":\"" + status + "\"," +
-	        "\"message\":\"" + message + "\"," +
-	        "\"locations\":" + locationsJson +
-	        "}";
-	    return jsonResponse;
+		String jsonResponse = "{" + "\"status\":\"" + status + "\"," + "\"message\":\"" + message + "\","
+				+ "\"locations\":" + locationsJson + "}";
+		return jsonResponse;
 	}
 
 	public static String convertLocationsToJson(List<Location> locations) {
-	    StringBuilder jsonBuilder = new StringBuilder("[");
-	    boolean first = true;
+		StringBuilder jsonBuilder = new StringBuilder("[");
+		boolean first = true;
 
-	    for (Location location : locations) {
-	        if (!first) {
-	            jsonBuilder.append(",");
-	        } else {
-	            first = false;
-	        }
-	        
-	        double note = location.getAcessibilityNote();
-	        String formattedNote = String.format("%.2f", note); // Format to 2 decimal places
-	       
+		for (Location location : locations) {
+			if (!first) {
+				jsonBuilder.append(",");
+			} else {
+				first = false;
+			}
 
-	        jsonBuilder.append("{")
-	            .append("\"id\":" + location.getId() + ",")
-	            .append("\"publicPlace\":\"" + escapeJsonString(location.getPublicPlace()) + "\",")
-	            .append("\"acessibilityNote\":\"" + escapeJsonString(formattedNote) + "\",")
-	            .append("\"neighborhood\":\"" + escapeJsonString(location.getNeighborhood()) + "\",")
-	            .append("\"city\":\"" + escapeJsonString(location.getCity()) + "\",")
-	            .append("\"uf\":\"" + escapeJsonString(location.getUf()) + "\",")
-	            .append("\"placeName\":\"" + escapeJsonString(location.getPlaceName()) + "\",")
-	            .append("\"cep\":\"" + escapeJsonString(location.getCep()) + "\",")
-	            .append("\"number\":\"" + escapeJsonString(location.getNumber()) + "\"");
+			double note = location.getAcessibilityNote();
+			String formattedNote = String.format("%.2f", note); // Format to 2 decimal places
 
-	        if (location instanceof Restaurant) {
-	            Restaurant restaurant = (Restaurant) location;
-	            jsonBuilder.append(",\"type\":\"restaurant\",")
-	                .append("\"typeOfCuisine\":\"" + escapeJsonString(restaurant.getTypeOfCuisine()) + "\",")
-	                .append("\"operatingDays\":\"" + escapeJsonString(restaurant.getOperatingDays()) + "\"");
-	        } else if (location instanceof Store) {
-	            Store store = (Store) location;
-	            jsonBuilder.append(",\"type\":\"store\",")
-	                .append("\"typeProduct\":\"" + escapeJsonString(store.getTypeProduct()) + "\"");
-	        } else {
-	            Event event = (Event) location;
-	            jsonBuilder.append(",\"type\":\"event\",")
-	                .append("\"startDate\":\"" + event.getStartDate() + "\",")
-	                .append("\"endDate\":\"" + event.getEndDate() + "\",")
-	                .append("\"eventPrice\":\"" + escapeJsonString(event.getEventPrice()) + "\"");
-	        }
+			jsonBuilder.append("{").append("\"id\":" + location.getId() + ",")
+					.append("\"publicPlace\":\"" + escapeJsonString(location.getPublicPlace()) + "\",")
+					.append("\"acessibilityNote\":\"" + escapeJsonString(formattedNote) + "\",")
+					.append("\"neighborhood\":\"" + escapeJsonString(location.getNeighborhood()) + "\",")
+					.append("\"city\":\"" + escapeJsonString(location.getCity()) + "\",")
+					.append("\"uf\":\"" + escapeJsonString(location.getUf()) + "\",")
+					.append("\"placeName\":\"" + escapeJsonString(location.getPlaceName()) + "\",")
+					.append("\"cep\":\"" + escapeJsonString(location.getCep()) + "\",")
+					.append("\"number\":\"" + escapeJsonString(location.getNumber()) + "\"");
 
-	        jsonBuilder.append("}");
-	    }
+			if (location instanceof Restaurant) {
+				Restaurant restaurant = (Restaurant) location;
+				jsonBuilder.append(",\"type\":\"restaurant\",")
+						.append("\"typeOfCuisine\":\"" + escapeJsonString(restaurant.getTypeOfCuisine()) + "\",")
+						.append("\"operatingDays\":\"" + escapeJsonString(restaurant.getOperatingDays()) + "\"");
+			} else if (location instanceof Store) {
+				Store store = (Store) location;
+				jsonBuilder.append(",\"type\":\"store\",")
+						.append("\"typeProduct\":\"" + escapeJsonString(store.getTypeProduct()) + "\"");
+			} else {
+				Event event = (Event) location;
+				jsonBuilder.append(",\"type\":\"event\",").append("\"startDate\":\"" + event.getStartDate() + "\",")
+						.append("\"endDate\":\"" + event.getEndDate() + "\",")
+						.append("\"eventPrice\":\"" + escapeJsonString(event.getEventPrice()) + "\"");
+			}
 
-	    jsonBuilder.append("]");
+			jsonBuilder.append("}");
+		}
 
-	    return jsonBuilder.toString();
+		jsonBuilder.append("]");
+
+		return jsonBuilder.toString();
 	}
-	
 
 	private static String escapeJsonString(String input) {
-	    if (input == null) {
-	        return "";
-	    }
+		if (input == null) {
+			return "";
+		}
 
-	    StringBuilder result = new StringBuilder();
-	    for (char c : input.toCharArray()) {
-	        switch (c) {
-	            case '"':
-	                result.append("\\\"");
-	                break;
-	            case '\\':
-	                result.append("\\\\");
-	                break;
-	            case '\b':
-	                result.append("\\b");
-	                break;
-	            case '\f':
-	                result.append("\\f");
-	                break;
-	            case '\n':
-	                result.append("\\n");
-	                break;
-	            case '\r':
-	                result.append("\\r");
-	                break;
-	            case '\t':
-	                result.append("\\t");
-	                break;
-	            default:
-	                result.append(c);
-	        }
-	    }
-	    return result.toString();
+		StringBuilder result = new StringBuilder();
+		for (char c : input.toCharArray()) {
+			switch (c) {
+			case '"':
+				result.append("\\\"");
+				break;
+			case '\\':
+				result.append("\\\\");
+				break;
+			case '\b':
+				result.append("\\b");
+				break;
+			case '\f':
+				result.append("\\f");
+				break;
+			case '\n':
+				result.append("\\n");
+				break;
+			case '\r':
+				result.append("\\r");
+				break;
+			case '\t':
+				result.append("\\t");
+				break;
+			default:
+				result.append(c);
+			}
+		}
+		return result.toString();
 	}
-
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse

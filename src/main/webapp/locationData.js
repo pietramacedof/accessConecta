@@ -59,11 +59,76 @@ $(document).ready(function() {
 
 	$('#radeButton').on('click', function () {
 	var v = $('#idLocationHidden').val();
-	console.log(v);
+	
 	var questionList = (localStorage.getItem('questionList'));
-	console.log('questionList', questionList);
-	console.log(questionList[0]);
-	var answersList;
+	 // Converte a string em um array de números
+    var questions = questionList.split(',').map(Number);
+
+    // Usa a função map para adicionar "answer-" a cada elemento
+    var mappedList = questions.map(function(question) {
+        return 'answer-' + question;
+    });
+		
+	var note = 0;
+    console.log('Mapped List:', mappedList);
+	
+	for (var i =  0; i < mappedList.length; i++) {
+    var mappedValue = mappedList[i];
+    var selectedValue = $('input[name="' + mappedValue + '"]:checked').val();
+    console.log(mappedValue + ':', selectedValue);
+	if(selectedValue === undefined){
+		sendToast('error', 'Verifique se todos os campos estão preenchidos.');
+		break;
+	}
+	selectedValue = parseFloat(selectedValue.replace(',', '.')); // Converter para número
+	note += selectedValue;
+	}
+	console.log(note);
+	var apiUrl = './hasLocation';
+	const token = localStorage.getItem('token');
+	const data = {
+	note: note,
+	id: v,
+	token: token
+	};
+	var queryString = Object.keys(data).map(key => key + '=' + encodeURIComponent(data[key])).join('&');
+	
+	 axios.post(apiUrl, queryString)
+	.then(response => {
+     console.log(response.data); 
+	 var n = response.data.accessibilityNote;
+	
+	 var arrayLocalStorage = JSON.parse(localStorage.getItem('locations'));
+	 console.log(v);
+	 
+	 var index = arrayLocalStorage.findIndex(obj => obj.id == v);
+	 console.log(index);
+	
+	 console.log(array);
+	
+	 arrayLocalStorage[index].accessibilityNote = n;
+	var newQuantity = parseInt(arrayLocalStorage[index].quantityOfEvaluation) + 1;
+    arrayLocalStorage[index].quantityOfEvaluation = newQuantity; // Supondo que você está incrementando o total de avaliações
+	var array = arrayLocalStorage[index];
+	var address = `${array.publicPlace}, ${array.number}, ${array.neighborhood}, ${array.city}, ${array.uf}`;
+	console.log(array);
+	console.log(array.quantityOfEvaluation);
+    const specificStarRating = $(`.my-rating-${v}`); // Seleciona por ID
+	specificStarRating.starRating('setRating', n);
+	$(`#pMyRating-${v}`).html(`(${newQuantity})`);
+	sendToast(response.data.status, response.data.message);// Aguarda  2 segundos antes de executar a função
+
+	const buttonEvaluate = document.getElementById(`buttonEvaluate${v}`);
+
+	buttonEvaluate.disabled = true;
+
+	 customCloseModal('evaluateData');
+	})
+	 .catch(error => {
+     console.error(`Erro ao enviar o número: ${error}`);
+	 });
+	});
+	
 });
 
 function sendToast(status, message) {
@@ -471,17 +536,16 @@ function renderLocations(location, address, mapContainerId, isUpdate) {
 }
 
 function inicializeStars(id, note){
+   console.log(note);
 	setTimeout(()=>{
-	var numeroAleatorio = Math.random();
-    var valorDesejado = Math.floor(numeroAleatorio *  4) +  1;
 	$(id).starRating({
-	initialRating: note,
+	initialRating: parseFloat(note),
 	readOnly: true,
 	strokeColor: '#894A00',
 	strokeWidth: 10,
 	starSize: 25
 });	
-	},100)
+	},1500)
   
 }
 
@@ -891,21 +955,28 @@ function renderLocationsEvaluator(location, address, mapContainerId) {
     var buttons = '';
 
     if (location.type == 'restaurant') {
+		console.log('é restaurante', location.quantityOfEvaluation);
 		console.log('IF');
         template = `
             <div class="header-location-info" id="nameLocal">
                 <h2>${location.placeName}</h2>
-				<div class="my-rating-${mapContainerId}"></div>
                 <i class="fa-solid fa-utensils customIconUtensils"></i>
             </div>
             <div class="content-location-info" id='infoLocal'>
+			
+				<div class="content-stars">
+				  <div class="container-star">
+				  <div class="my-rating-${mapContainerId}"></div>
+				  </div>
+				  <p id="pMyRating-${mapContainerId}">(${location.quantityOfEvaluation})</p>
+				</div>
                 <p><strong>Endereço:</strong> ${address}</p>
                 <p><strong>Dias de Abertura:</strong> ${location.operatingDays}</p>
             </div>
             <!-- Adicione um contêiner para o mapa com um ID exclusivo -->
             <div id="${mapContainerId}" class="map-container" style="height: 200px;"></div>
             <div class="btn-section">
-                <button class="btn btn-primary" onClick="evaluateLocation(${mapContainerId})">Avaliar</button>
+                <button id="buttonEvaluate${mapContainerId}" class="btn btn-primary" onClick="evaluateLocation(${mapContainerId})">Avaliar</button>
                 <button class="btn btn-info" onClick="learnMore(${mapContainerId})">Saiba mais</button>
             </div>
         `;
@@ -916,10 +987,15 @@ function renderLocationsEvaluator(location, address, mapContainerId) {
         template = `
             <div class="header-location-info" id="nameLocal">
                 <h2>${location.placeName}</h2>
-				<div class="my-rating-${mapContainerId}"></div>
                 <i class="fa-solid fa-champagne-glasses customIconChampagne"></i>
             </div>
             <div class="content-location-info" id='infoLocal'>
+				<div class="content-stars">
+					<div class="container-star">
+				 <div class="my-rating-${mapContainerId}"></div>
+					</div>
+					 <p id="pMyRating-${mapContainerId}">(${location.quantityOfEvaluation})</p>
+				</div>
                 <p><strong>Endereço: </strong> ${address}</p>
 				<p><strong>Data de Início:</strong> ${startDateFormate}</p>
 	            <p><strong>Data de Fim:</strong> ${endDateFormate}</p>
@@ -927,7 +1003,7 @@ function renderLocationsEvaluator(location, address, mapContainerId) {
             <!-- Adicione um contêiner para o mapa com um ID exclusivo -->
             <div id="${mapContainerId}" class="map-container" style="height: 200px;"></div>
             <div class="btn-section">
-                <button class="btn btn-primary" onClick="evaluateLocation(${mapContainerId})">Avaliar</button>
+                <button id="buttonEvaluate${mapContainerId}" class="btn btn-primary" onClick="evaluateLocation(${mapContainerId})">Avaliar</button>
                 <button class="btn btn-info" onClick="learnMore(${mapContainerId})">Saiba mais</button>
             </div>
         `;
@@ -936,17 +1012,22 @@ function renderLocationsEvaluator(location, address, mapContainerId) {
         template = 
 		`
         	<div class="header-location-info" id="nameLocal"><h2>${location.placeName}</h2>
-			<div class="my-rating-${mapContainerId}"></div>
 			<i class="fa-solid fa-store customIconStore"></i>
         	</div>
             <div class="content-location-info" id='infoLocal'>
-            <p><strong>Endereço:</strong> ${address}</p>
+			<div class="content-stars">
+			<div class="container-star">
+				 <div class="my-rating-${mapContainerId}"></div>
+			</div>
+			 <p id="pMyRating-${mapContainerId}">(${location.quantityOfEvaluation})</p>
+			</div>
+			<p><strong>Endereço:</strong> ${address}</p>
             <p><strong>Tipo de Produto:</strong> ${location.typeProduct}</p>
             </div>
 			<!-- Adicione um contêiner para o mapa com um ID exclusivo -->
             <div id="${mapContainerId}" class="map-container" style="height: 200px;"></div>
             <div class="btn-section">
-                <button class="btn btn-primary" onClick="evaluateLocation(${mapContainerId})">Avaliar</button>
+                <button id="buttonEvaluate${mapContainerId}" class="btn btn-primary" onClick="evaluateLocation(${mapContainerId})">Avaliar</button>
                 <button class="btn btn-info" onClick="learnMore(${mapContainerId})">Saiba mais</button>
             </div>
         `;
@@ -991,7 +1072,7 @@ function evaluateLocation(id){
 			<p>${index + 1}. ${question.question_text}<\p>
 			<div class="input-group mb-3">
 				<div class="input-group-text">
-					<input type='radio' id="answer-${question.question_id}-1" name="awnser-${question.question_id}" value="2"><label for="answer-${question.question_id}-1">Suficiente</label>
+					<input type='radio' id="answer-${question.question_id}-1" name="answer-${question.question_id}" value="2"><label for="answer-${question.question_id}-1">Suficiente</label>
 				</div>
 				<div class="input-group-text">
 					<input type='radio' id="answer-${question.question_id}-2" name="answer-${question.question_id}" value="1"><label for="answer-${question.question_id}-2">Parcial</label>
@@ -1015,13 +1096,3 @@ function evaluateLocation(id){
     });
 	console.log("Entranndo na avaliação.");
 }
-
-
-
-
-
-
-
-
-
-

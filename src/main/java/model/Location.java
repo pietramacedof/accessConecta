@@ -1,5 +1,6 @@
 package model;
 
+import java.sql.SQLException; 
 import java.util.List; 
 
 import model.dao.LocationDAO;
@@ -10,6 +11,7 @@ public class Location {
 	private String neighborhood;
 	private String city;
 	private double acessibilityNote;
+	private Integer quantityOfEvaluation;
 	private String uf;
 	private String placeName;
 	private String cep;
@@ -46,6 +48,36 @@ public class Location {
 		}
 	}
 	
+	public double getLocationTotalRating(String id) {
+		LocationDAO dao = new LocationDAO();
+		double total = dao.getLocationTotalRatingById(id);
+		return total;
+	}
+	
+	public Location evaluateLocation(String id, double note, User u) throws SQLException {
+		double convertedNote = (5*note)/16;
+		System.out.println(convertedNote);
+		LocationDAO dao = new LocationDAO();
+		Location l = new Location();
+		l = dao.consultLocationById(id);
+		dao.insertEvaluation(u.getId(), l.getId(), convertedNote);
+		double total = l.getLocationTotalRating(l.getId());
+		l.setQuantityOfEvaluation(l.getQuantityOfEvaluation() + 1);
+		double x = (convertedNote + total)/l.getQuantityOfEvaluation();
+		l.setAcessibilityNote(x);
+		dao.updateNoteById(l, total, convertedNote);
+		return l;
+	}
+	
+	public boolean checkerNote(double note) {
+		if(note <= 16) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
 	
 	public Location() {
 		
@@ -62,13 +94,14 @@ public class Location {
 		this.number = number;
 	}
 
-	public Location(String id, String publicPlace, String neighborhood, String city, double acessibilityNote, String uf, String placeName,
+	public Location(String id, String publicPlace, String neighborhood, String city, double acessibilityNote, Integer quantityOfEvaluation, String uf, String placeName,
 			String cep, String number) {
 		this.id = id;
 		this.publicPlace = publicPlace;
 		this.neighborhood = neighborhood;
 		this.city = city;
 		this.acessibilityNote = acessibilityNote;
+		this.quantityOfEvaluation = quantityOfEvaluation;
 		this.uf = uf;
 		this.placeName = placeName;
 		this.cep = cep;
@@ -159,4 +192,14 @@ public class Location {
 	public void setAcessibilityNote(double acessibilityNote) {
 		this.acessibilityNote = acessibilityNote;
 	}
+
+	public Integer getQuantityOfEvaluation() {
+		return quantityOfEvaluation;
+	}
+
+	public void setQuantityOfEvaluation(Integer quantityOfEvaluation) {
+		this.quantityOfEvaluation = quantityOfEvaluation;
+	}
+	
+	
 }
