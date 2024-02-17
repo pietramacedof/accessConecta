@@ -3,11 +3,11 @@
 $(document).ready(function() {
 
 	const isLogged = localStorage.getItem('token');
-	
+
 	if (!isLogged) {
 		localStorage.clear();
 		window.location.href = './';
-		console.log('tá logado' , isLogged);
+		console.log('tá logado', isLogged);
 		return;
 	}
 	$('.pageload').show();
@@ -21,16 +21,16 @@ $(document).ready(function() {
 			window.location.href = './';
 		}
 		else {
-			if(response.data.userType == 1){
+			if (response.data.userType == 1) {
 				console.log('Tipo de usuario: ', response.data.userType);
 				checkUserHasLocation(isLogged);
 			}
 			else {
 				console.log('Tipo de usuario: ', response.data.userType);
-				loadLocations();
+				loadLocations(isLogged);
 			}
 
-			
+
 		}
 	}).catch((error) => {
 		console.error(error);
@@ -57,78 +57,82 @@ $(document).ready(function() {
 		$('#liveToast').toast('show');
 	});
 
-	$('#radeButton').on('click', function () {
-	var v = $('#idLocationHidden').val();
-	
-	var questionList = (localStorage.getItem('questionList'));
-	 // Converte a string em um array de números
-    var questions = questionList.split(',').map(Number);
-
-    // Usa a função map para adicionar "answer-" a cada elemento
-    var mappedList = questions.map(function(question) {
-        return 'answer-' + question;
-    });
-		
-	var note = 0;
-    console.log('Mapped List:', mappedList);
-	
-	for (var i =  0; i < mappedList.length; i++) {
-    var mappedValue = mappedList[i];
-    var selectedValue = $('input[name="' + mappedValue + '"]:checked').val();
-    console.log(mappedValue + ':', selectedValue);
-	if(selectedValue === undefined){
-		sendToast('error', 'Verifique se todos os campos estão preenchidos.');
-		break;
-	}
-	selectedValue = parseFloat(selectedValue.replace(',', '.')); // Converter para número
-	note += selectedValue;
-	}
-	console.log(note);
-	var apiUrl = './hasLocation';
-	const token = localStorage.getItem('token');
-	const data = {
-	note: note,
-	id: v,
-	token: token
-	};
-	var queryString = Object.keys(data).map(key => key + '=' + encodeURIComponent(data[key])).join('&');
-	
-	 axios.post(apiUrl, queryString)
-	.then(response => {
-     console.log(response.data); 
-	 var n = response.data.accessibilityNote;
-	
-	 var arrayLocalStorage = JSON.parse(localStorage.getItem('locations'));
-	 console.log(v);
-	 
-	 var index = arrayLocalStorage.findIndex(obj => obj.id == v);
-	 console.log(index);
-	
-	 console.log(array);
-	
-	 arrayLocalStorage[index].accessibilityNote = n;
-	var newQuantity = parseInt(arrayLocalStorage[index].quantityOfEvaluation) + 1;
-    arrayLocalStorage[index].quantityOfEvaluation = newQuantity; // Supondo que você está incrementando o total de avaliações
-	var array = arrayLocalStorage[index];
-	var address = `${array.publicPlace}, ${array.number}, ${array.neighborhood}, ${array.city}, ${array.uf}`;
-	console.log(array);
-	console.log(array.quantityOfEvaluation);
-    const specificStarRating = $(`.my-rating-${v}`); // Seleciona por ID
-	specificStarRating.starRating('setRating', n);
-	$(`#pMyRating-${v}`).html(`(${newQuantity})`);
-	sendToast(response.data.status, response.data.message);// Aguarda  2 segundos antes de executar a função
-
-	const buttonEvaluate = document.getElementById(`buttonEvaluate${v}`);
-
-	buttonEvaluate.disabled = true;
-
-	 customCloseModal('evaluateData');
-	})
-	 .catch(error => {
-     console.error(`Erro ao enviar o número: ${error}`);
-	 });
+	$(function() {
+		$('[data-toggle="tooltip"]').tooltip()
 	});
-	
+
+	$('#radeButton').on('click', function() {
+		var v = $('#idLocationHidden').val();
+
+		var questionList = (localStorage.getItem('questionList'));
+		// Converte a string em um array de números
+		var questions = questionList.split(',').map(Number);
+
+		// Usa a função map para adicionar "answer-" a cada elemento
+		var mappedList = questions.map(function(question) {
+			return 'answer-' + question;
+		});
+
+		var note = 0;
+		console.log('Mapped List:', mappedList);
+
+		for (var i = 0; i < mappedList.length; i++) {
+			var mappedValue = mappedList[i];
+			var selectedValue = $('input[name="' + mappedValue + '"]:checked').val();
+			console.log(mappedValue + ':', selectedValue);
+			if (selectedValue === undefined) {
+				sendToast('error', 'Verifique se todos os campos estão preenchidos.');
+				break;
+			}
+			selectedValue = parseFloat(selectedValue.replace(',', '.')); // Converter para número
+			note += selectedValue;
+		}
+		console.log(note);
+		var apiUrl = './hasLocation';
+		const token = localStorage.getItem('token');
+		const data = {
+			note: note,
+			id: v,
+			token: token
+		};
+		var queryString = Object.keys(data).map(key => key + '=' + encodeURIComponent(data[key])).join('&');
+
+		axios.post(apiUrl, queryString)
+			.then(response => {
+				console.log(response.data);
+				var n = response.data.accessibilityNote;
+
+				var arrayLocalStorage = JSON.parse(localStorage.getItem('locations'));
+				console.log(v);
+
+				var index = arrayLocalStorage.findIndex(obj => obj.id == v);
+				console.log(index);
+
+				console.log(array);
+
+				arrayLocalStorage[index].accessibilityNote = n;
+				var newQuantity = parseInt(arrayLocalStorage[index].quantityOfEvaluation) + 1;
+				arrayLocalStorage[index].quantityOfEvaluation = newQuantity; // Supondo que você está incrementando o total de avaliações
+				var array = arrayLocalStorage[index];
+				var address = `${array.publicPlace}, ${array.number}, ${array.neighborhood}, ${array.city}, ${array.uf}`;
+				console.log(array);
+				console.log(array.quantityOfEvaluation);
+				const specificStarRating = $(`.my-rating-${v}`); // Seleciona por ID
+				specificStarRating.starRating('setRating', n);
+				$(`#pMyRating-${v}`).html(`(${newQuantity})`);
+				sendToast(response.data.status, response.data.message);// Aguarda  2 segundos antes de executar a função
+
+				const buttonEvaluate = document.getElementById(`buttonEvaluate${v}`);
+
+				buttonEvaluate.disabled = true;
+
+				customCloseModal('evaluateData');
+			})
+			.catch(error => {
+				console.error(`Erro ao enviar o número: ${error}`);
+			});
+	});
+
 });
 
 function sendToast(status, message) {
@@ -174,7 +178,7 @@ function resetFields() {
 
 }
 
-$('#toAlterPasswordBtn').on('click', function () {
+$('#toAlterPasswordBtn').on('click', function() {
 	$('#toAlterPassword').modal('show');
 	let firstName = localStorage.getItem('firstName');
 	let lastName = localStorage.getItem('lastName');
@@ -184,56 +188,56 @@ $('#toAlterPasswordBtn').on('click', function () {
 	let token = localStorage.getItem('token');
 
 	$('#userFirstName').val(firstName);
-    $('#userLast').val(lastName);
-    $('#userEmail').val(email);
-    $('#userDateOfBirth').val(dateOfBirth);
-    $('#userFirstName').prop('disabled', true);
+	$('#userLast').val(lastName);
+	$('#userEmail').val(email);
+	$('#userDateOfBirth').val(dateOfBirth);
+	$('#userFirstName').prop('disabled', true);
 	$('#userLast').prop('disabled', true);
 	$('#userEmail').prop('disabled', true);
 	$('#userDateOfBirth').prop('disabled', true);
 	console.log(firstName, lastName, email);
-	
+
 });
 
-$('#confirmToAlterPassword').on('click', function () {
+$('#confirmToAlterPassword').on('click', function() {
 	let password = $('#userPassword').val();
 	let confirmPassword = $('#userConfirmPassword').val();
 	let email = $('#userEmail').val();
 	let firstName = $('#userFirstName').val();
 	let lastName = $('#userLast').val();
 	let dateOfBirth = $('#userDateOfBirth').val();
-	if(!password || !confirmPassword){
+	if (!password || !confirmPassword) {
 		sendToast("error", "Confira se todos os campos estão preenchidos.");
 		return;
 	}
 
 	console.log(password, confirmPassword, email, firstName);
-	
-	if(password != confirmPassword){
+
+	if (password != confirmPassword) {
 		sendToast("error", "As senhas inseridas não correspondem.");
 		return;
 	}
 	let userType = localStorage.getItem('userType');
-	
+
 	let userData = {
-    password: password,
-    confirmPassword: confirmPassword,
-    email: email,
-    firstName: firstName,
-    lastName: lastName,
-	userType: userType,
-	dateOfBirth: dateOfBirth
-};
+		password: password,
+		confirmPassword: confirmPassword,
+		email: email,
+		firstName: firstName,
+		lastName: lastName,
+		userType: userType,
+		dateOfBirth: dateOfBirth
+	};
 
 	let apiUrl = './modifyPassword';
 	let token = localStorage.getItem('token');
 	axios.post(apiUrl, userData, {
-	   headers: {
+		headers: {
 			'Content-Type': 'application/x-www-form-urlencoded',
 			'Authorization': `Bearer ${token}`
 		},
 	})
-	.then((response) => {
+		.then((response) => {
 			console.log(response.data);
 			console.log(data.status);
 			var result = response.data;
@@ -243,13 +247,13 @@ $('#confirmToAlterPassword').on('click', function () {
 			}
 			sendToast(result.status, result.message);
 			customCloseModal('toAlterPassword');
-			
+
 		})
 		.catch((error) => {
 			console.error(error);
 			sendToast("error", "Dados inválidos, tente novamente!");
 		});
-	
+
 });
 
 document.getElementById('registerLocation').addEventListener('submit', function(event) {
@@ -408,7 +412,7 @@ document.getElementById('registerLocation').addEventListener('submit', function(
 			localStorage.setItem('hasLocation', true);
 
 
-			
+
 
 			$('#registerLocationModal').hide();
 			$('#noLocationInfo').hide();
@@ -504,8 +508,8 @@ function renderLocations(location, address, mapContainerId, isUpdate) {
         	`
 	}
 	else {
-		template = 
-		`
+		template =
+			`
         	
         	<div class="header-location-info" id="nameLocal"><h2>${location.placeName}</h2>
 			<div class="my-rating-${mapContainerId}"></div>
@@ -523,86 +527,86 @@ function renderLocations(location, address, mapContainerId, isUpdate) {
 			
         	 
         `;
-		
+
 	}
 	inicializeStars(`.my-rating-${mapContainerId}`, location.acessibilityNote);
 	initMap(address, mapContainerId);
-	if(isUpdate){
+	if (isUpdate) {
 		$(`#locationInfo-${customId}`).html(template);
 		return;
 	}
 	$('#hasLocation').append(`<div id="locationInfo-${customId}" class="location-info">${template}</div>`);
-		
+
 }
 
-function inicializeStars(id, note){
-   console.log(note);
-	setTimeout(()=>{
-	$(id).starRating({
-	initialRating: parseFloat(note),
-	readOnly: true,
-	strokeColor: '#894A00',
-	strokeWidth: 10,
-	starSize: 25
-});	
-	},1500)
-  
+function inicializeStars(id, note) {
+	console.log(note);
+	setTimeout(() => {
+		$(id).starRating({
+			initialRating: parseFloat(note),
+			readOnly: true,
+			strokeColor: '#894A00',
+			strokeWidth: 10,
+			starSize: 25
+		});
+	}, 1500)
+
 }
 
 function editLocal(id) {
-    const locations = JSON.parse(localStorage.getItem('dataLocation'));
-  const location = locations.find((loc) => loc.id == id);
-  console.log(location);
-  //oculta todos os campos customizados
-  $('#rowRestaurant').hide();
-  $('#rowEvent').hide();
-  $('#rowStore').hide();
+	const locations = JSON.parse(localStorage.getItem('dataLocation'));
+	const location = locations.find((loc) => loc.id == id);
+	console.log(location);
+	//oculta todos os campos customizados
+	$('#rowRestaurant').hide();
+	$('#rowEvent').hide();
+	$('#rowStore').hide();
 
-  //seta os valores nos campos
-  $('#name').val(location.placeName);
-  $('#postalCode').val(location.cep);
-  $('#publicPlace').val(location.publicPlace);
-  $('#number').val(location.number);
-  $('#neighborhood').val(location.neighborhood);
-  $('#city').val(location.city);
-  $('#state').val(location.uf);
-  $('#idHidden').val(location.id);
-  $('#typeHidden').val(location.type);
-  if (location.type == 'restaurant') {
-    console.log('é restaurante');
-    $('#editTypeOfCuisine').val(location.typeOfCuisine);
-    $('#editOperatingDays').val(location.operatingDays);
-    $('#rowRestaurant').show();
-  }
-  else if (location.type == 'event') {
-    console.log('é evento');
-    var start = formateDate(location.startDate);
-    console.log(start);
-    $('#editStartDate').val(location.startDate);
-    $('#editEndDate').val(location.endDate);
-    $('#rowEvent').show();
-  }
-  else {
-    console.log('é loja');
-    $('#typeOfProduct').val(location.typeProduct)
-    $('#rowStore').show();
-  }
-  const myModal = document.getElementById('editData');
-  const bootstrapModal = new bootstrap.Modal(myModal);
-  bootstrapModal.show();
+	//seta os valores nos campos
+	$('#name').val(location.placeName);
+	$('#postalCode').val(location.cep);
+	$('#publicPlace').val(location.publicPlace);
+	$('#number').val(location.number);
+	$('#neighborhood').val(location.neighborhood);
+	$('#city').val(location.city);
+	$('#state').val(location.uf);
+	$('#idHidden').val(location.id);
+	$('#typeHidden').val(location.type);
+	if (location.type == 'restaurant') {
+		console.log('é restaurante');
+		$('#editTypeOfCuisine').val(location.typeOfCuisine);
+		$('#editOperatingDays').val(location.operatingDays);
+		$('#rowRestaurant').show();
+	}
+	else if (location.type == 'event') {
+		console.log('é evento');
+		var start = formateDate(location.startDate);
+		console.log(start);
+		$('#editStartDate').val(location.startDate);
+		$('#editEndDate').val(location.endDate);
+		$('#rowEvent').show();
+	}
+	else {
+		console.log('é loja');
+		$('#typeOfProduct').val(location.typeProduct)
+		$('#rowStore').show();
+	}
+	const myModal = document.getElementById('editData');
+	const bootstrapModal = new bootstrap.Modal(myModal);
+	bootstrapModal.show();
 
 }
 
 function customCloseModal(id) {
 	$('body').removeClass('modal-open');
-			$('body').attr('style', '');
-			$('#' + id).hide();
-			$('#' + id).removeClass('show');
-			$('.modal-backdrop').removeClass('show');
-			$('.modal-backdrop').remove();
+	$('body').attr('style', '');
+	$('#' + id).hide();
+	$('#' + id).removeClass('show');
+	$('.modal-backdrop').removeClass('show');
+	$('.modal-backdrop').remove();
 }
 
-  $('#toAlterButton').on('click', function () {
+$('#toAlterButton').on('click', function() {
 	var locationName = $('#name').val();
 	var postalCode = $('#postalCode').val();
 	var street = $('#publicPlace').val();
@@ -611,8 +615,8 @@ function customCloseModal(id) {
 	var city = $('#city').val();
 	var state = $('#state').val();
 	var id = $('#idHidden').val();
-	var type =  $('#typeHidden').val();
-	
+	var type = $('#typeHidden').val();
+
 	var address = `${street}, ${number}, ${neighborhood}, ${city}, ${state}`;
 	console.log(address);
 	switch (type) {
@@ -645,8 +649,8 @@ function customCloseModal(id) {
 					return;
 				}
 			}
-			
-			
+
+
 			break;
 		case 'store':
 			var productType = $('#typeOfProduct').val();
@@ -658,9 +662,9 @@ function customCloseModal(id) {
 				$('.pageload').hide();
 				return;
 			}
-			break;	
+			break;
 	}
-	  var data = {
+	var data = {
 		locationName: locationName,
 		postalCode: postalCode,
 		street: street,
@@ -671,12 +675,12 @@ function customCloseModal(id) {
 		locationType: type,
 		locationId: id,
 	};
-	  
-var updateData =     {
-        "id": id,
-        "placeName": locationName,
-        "type": type,
-    };
+
+	var updateData = {
+		"id": id,
+		"placeName": locationName,
+		"type": type,
+	};
 	switch (type) {
 		case 'restaurant':
 			data['cuisineType'] = cuisineType;
@@ -698,7 +702,7 @@ var updateData =     {
 	let token = localStorage.getItem('token');
 	var url = './alterLocation';
 	console.log(data);
-var queryString = Object.keys(data).map(key => key + '=' + encodeURIComponent(data[key])).join('&');
+	var queryString = Object.keys(data).map(key => key + '=' + encodeURIComponent(data[key])).join('&');
 
 	axios.post(url, queryString, {
 		headers: {
@@ -706,7 +710,7 @@ var queryString = Object.keys(data).map(key => key + '=' + encodeURIComponent(da
 			'Authorization': `Bearer ${token}`
 		},
 	})
-	  .then((response) => {
+		.then((response) => {
 			console.log(response.data);
 			console.log(data.status);
 			var result = response.data;
@@ -716,16 +720,16 @@ var queryString = Object.keys(data).map(key => key + '=' + encodeURIComponent(da
 			}
 			resetFields();
 			sendToast(result.status, result.message);
-		    console.log("Type: ", updateData.productType);
+			console.log("Type: ", updateData.productType);
 			renderLocations(updateData, address, id, true)
 			customCloseModal('editData');
-			
+
 		})
 		.catch((error) => {
 			console.error(error);
 			sendToast("error", "Dados inválidos, tente novamente!");
 		});
-  });
+});
 
 function deleteLocal(id) {
 	const myModal = document.getElementById('deleteData');
@@ -736,15 +740,15 @@ function deleteLocal(id) {
 }
 
 function updateDelete(array, id) {
-    if(array.length === 0) return;
-    const newArray = array.filter(objeto => objeto.id !== id);
-    
-    // Retorna o array atualizado
-    return newArray;
+	if (array.length === 0) return;
+	const newArray = array.filter(objeto => objeto.id !== id);
+
+	// Retorna o array atualizado
+	return newArray;
 }
 
-function handleSections(array){
-	if(array.length > 0){
+function handleSections(array) {
+	if (array.length > 0) {
 		$('#noLocationInfo').hide();
 		$('#hasLocationSection').show();
 		return;
@@ -788,7 +792,7 @@ function sendDeleteLocal(id) {
 function checkUserHasLocation(token) {
 	console.log('checando locais');
 	$('.pageload').show();
-	return axios.get('./hasLocation',  {
+	return axios.get('./hasLocation', {
 		headers: {
 			'Authorization': `Bearer ${token}`
 		}
@@ -901,24 +905,28 @@ function generateRandomId() {
 
 
 document.getElementById('closeSession').addEventListener('click', function() {
-    console.log('caiu');
+	console.log('caiu');
 	localStorage.clear();
 	window.location.href = './';
-	
+
 });
 
-function loadLocations() {
+function loadLocations(isLogged) {
 	console.log('loadLocations');
 	var apiUrl = './registerLocation';
-	axios.get(apiUrl)
-    .then(response => {
-        var result = response.data;
-        console.log(result);
-		$('#hasLocationSection').show();
-		if (response.data.status == "success") {
+	axios.get(apiUrl, {
+		headers: {
+			Authorization: `Bearer ${isLogged}`
+		}
+	})
+		.then(response => {
+			var result = response.data;
+			console.log(result);
+			$('#hasLocationSection').show();
+			if (response.data.status == "success") {
 				localStorage.setItem('locations', JSON.stringify(response.data.locations));
 				const locations = response.data.locations;
-				
+
 				setTimeout(function() {
 
 
@@ -932,32 +940,81 @@ function loadLocations() {
 						return;
 					})
 				}, 2000);
-				
+
 
 				return;
 			}
-		
-		
-    })
-    .catch(error => {
-        console.error(error);
-    })
-    .finally(() => {
-        $('.pageload').hide();
-    });
+
+
+		})
+		.catch(error => {
+			console.error(error);
+		})
+		.finally(() => {
+			$('.pageload').hide();
+		});
+}
+
+function learnMore(id) {
+
+
+
+	const myModal = document.getElementById('learnMore');
+	// Suponha que 'locationId' é a chave que você usou para armazenar o objeto Location no localStorage
+	var locationId = id;
+
+	var locationString = localStorage.getItem('locations');
+
+	// Converte a string JSON para um array de objetos JavaScript
+	var locationsArray = JSON.parse(locationString);
+
+
+	// Encontra o objeto Location com o ID específico
+	var locationObject = locationsArray.find(function(location) {
+		return location.id == id;
+	});
+
+	console.log(locationObject);
+
+	const bootstrapModal = new bootstrap.Modal(myModal);
+	bootstrapModal.show();
+	const modalTitle = document.querySelector('.modal-title');
+
+	const template =
+		`
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">OI, EU SOU UMA IA BURRA</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+				</div>
+				<input type="hidden" id="idLocationHidden">
+				<div class="modal-body" id="questions">
+					<p>Deu certo, essa coisa</p>
+				</div>
+				<div class="modal-footer">
+					<button id="radeButton" type="button" class="btn btn-primary">Deletar</button>
+				</div>
+			</div>`
+
+	$('#learnMore').html(template);
+
 }
 
 function renderLocationsEvaluator(location, address, mapContainerId) {
 	console.log('RenderLocationsEvaluator');
 	console.log(address);
-    const customId = mapContainerId;
-    var template = '';
-    var buttons = '';
+	const customId = mapContainerId;
+	var template = '';
+	var buttons = '';
 
-    if (location.type == 'restaurant') {
+	const disableButton = location.locationEvaluation === 'true' ? 'disabled' : '';
+	const buttonAttributes = disableButton ? 'tabindex="0" data-placement="bottom" data-toggle="tooltip" title="Avaliação já realizada"' : '';
+
+	if (location.type == 'restaurant') {
 		console.log('é restaurante', location.quantityOfEvaluation);
 		console.log('IF');
-        template = `
+		template = `
             <div class="header-location-info" id="nameLocal">
                 <h2>${location.placeName}</h2>
                 <i class="fa-solid fa-utensils customIconUtensils"></i>
@@ -976,15 +1033,15 @@ function renderLocationsEvaluator(location, address, mapContainerId) {
             <!-- Adicione um contêiner para o mapa com um ID exclusivo -->
             <div id="${mapContainerId}" class="map-container" style="height: 200px;"></div>
             <div class="btn-section">
-                <button id="buttonEvaluate${mapContainerId}" class="btn btn-primary" onClick="evaluateLocation(${mapContainerId})">Avaliar</button>
+                <button id="buttonEvaluate${mapContainerId}" class="btn btn-primary" onClick="evaluateLocation(${mapContainerId})" ${disableButton}>Avaliar</button>
                 <button class="btn btn-info" onClick="learnMore(${mapContainerId})">Saiba mais</button>
             </div>
         `;
-    }
-    else if (location.type == 'event') {
+	}
+	else if (location.type == 'event') {
 		startDateFormate = formateDate(location.startDate);
 		endDateFormate = formateDate(location.endDate);
-        template = `
+		template = `
             <div class="header-location-info" id="nameLocal">
                 <h2>${location.placeName}</h2>
                 <i class="fa-solid fa-champagne-glasses customIconChampagne"></i>
@@ -1003,14 +1060,15 @@ function renderLocationsEvaluator(location, address, mapContainerId) {
             <!-- Adicione um contêiner para o mapa com um ID exclusivo -->
             <div id="${mapContainerId}" class="map-container" style="height: 200px;"></div>
             <div class="btn-section">
-                <button id="buttonEvaluate${mapContainerId}" class="btn btn-primary" onClick="evaluateLocation(${mapContainerId})">Avaliar</button>
-                <button class="btn btn-info" onClick="learnMore(${mapContainerId})">Saiba mais</button>
+                <button id="buttonEvaluate${mapContainerId}" class="btn btn-primary" onClick="evaluateLocation(${mapContainerId})" ${disableButton}>Avaliar</button>
+
+				<button class="btn btn-info" onClick="learnMore(${mapContainerId})">Saiba mais</button>
             </div>
         `;
-    }
-    else {
-        template = 
-		`
+	}
+	else {
+		template =
+			`
         	<div class="header-location-info" id="nameLocal"><h2>${location.placeName}</h2>
 			<i class="fa-solid fa-store customIconStore"></i>
         	</div>
@@ -1027,48 +1085,48 @@ function renderLocationsEvaluator(location, address, mapContainerId) {
 			<!-- Adicione um contêiner para o mapa com um ID exclusivo -->
             <div id="${mapContainerId}" class="map-container" style="height: 200px;"></div>
             <div class="btn-section">
-                <button id="buttonEvaluate${mapContainerId}" class="btn btn-primary" onClick="evaluateLocation(${mapContainerId})">Avaliar</button>
-                <button class="btn btn-info" onClick="learnMore(${mapContainerId})">Saiba mais</button>
+                <button id="buttonEvaluate${mapContainerId}" class="btn btn-primary" onClick="evaluateLocation(${mapContainerId})" ${disableButton}>Avaliar</button>
+				<button class="btn btn-info" onClick="learnMore(${mapContainerId})">Saiba mais</button>
             </div>
         `;
-    }
+	}
 
-    console.log(location, template);
+	console.log(location, template);
 	inicializeStars(`.my-rating-${mapContainerId}`, location.acessibilityNote);
 	console.log(location.acessibilityNote);
-    initMap(address, mapContainerId);
+	initMap(address, mapContainerId);
 
-    $('#cardLocation').append(`<div id="locationInfo-${customId}" class="location-info">${template}</div>`);
+	$('#cardLocation').append(`<div id="locationInfo-${customId}" class="location-info">${template}</div>`);
 }
 
-function evaluateLocation(id){
-	
+function evaluateLocation(id) {
+
 	console.log(id);
-	
+
 	$('#idLocationHidden').val(id);
-	
+
 	let apiUrl = './standard';
-	
+
 	axios.get(apiUrl)
-	.then(response => {
-		$('#questions').html('');
-       
-		const myModal = document.getElementById('evaluateData');
-		
-		const bootstrapModal = new bootstrap.Modal(myModal);
-		bootstrapModal.show();
-		const modalTitle = document.querySelector('.modal-title');
-		const standardName = response.data[0].standard_name;
-		
-		modalTitle.textContent = standardName + ' - Avalie este local';
-		const questions = response.data[0].questions;
-		
-		const modalBody = document.querySelector('.modal-body');
-		var template = '';
-		var values = [];
-		questions.map((question, index) => {
-			values.push(question.question_id);
-			template += `<div>
+		.then(response => {
+			$('#questions').html('');
+
+			const myModal = document.getElementById('evaluateData');
+
+			const bootstrapModal = new bootstrap.Modal(myModal);
+			bootstrapModal.show();
+			const modalTitle = document.querySelector('.modal-title');
+			const standardName = response.data[0].standard_name;
+
+			modalTitle.textContent = standardName + ' - Avalie este local';
+			const questions = response.data[0].questions;
+
+			const modalBody = document.querySelector('.modal-body');
+			var template = '';
+			var values = [];
+			questions.map((question, index) => {
+				values.push(question.question_id);
+				template += `<div>
 			<p>${index + 1}. ${question.question_text}<\p>
 			<div class="input-group mb-3">
 				<div class="input-group-text">
@@ -1082,17 +1140,27 @@ function evaluateLocation(id){
 				</div>
 			</div>
 			<\div>`;
+			})
+			localStorage.setItem('questionList', values);
+			console.log(template);
+			$('#questions').append(template);
+
 		})
-		localStorage.setItem('questionList', values);
-		console.log(template);
-		$('#questions').append(template);
-		
-    })
-    .catch(error => {
-        console.error(error);
-    })
-    .finally(() => {
-        $('.pageload').hide();
-    });
+		.catch(error => {
+			console.error(error);
+		})
+		.finally(() => {
+			$('.pageload').hide();
+		});
 	console.log("Entranndo na avaliação.");
 }
+
+
+
+
+
+
+
+
+
+

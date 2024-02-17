@@ -33,6 +33,7 @@ public class IsLogged extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String authHeader = request.getHeader("Authorization");
 		String token = authHeader.substring(7);
+		System.out.println(token);
 		User user = new User();
 		user = user.findUserByToken(token);
 		response.setContentType("application/json;charset=UTF-8");

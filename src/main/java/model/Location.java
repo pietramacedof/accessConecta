@@ -60,7 +60,8 @@ public class Location {
 		LocationDAO dao = new LocationDAO();
 		Location l = new Location();
 		l = dao.consultLocationById(id);
-		dao.insertEvaluation(u.getId(), l.getId(), convertedNote);
+		Evaluation e = new Evaluation(convertedNote, u, l);
+		dao.insertEvaluation(e);
 		double total = l.getLocationTotalRating(l.getId());
 		l.setQuantityOfEvaluation(l.getQuantityOfEvaluation() + 1);
 		double x = (convertedNote + total)/l.getQuantityOfEvaluation();

@@ -96,8 +96,7 @@ public class HasLocation extends HttpServlet {
 				out.println(jsonResponse);
 			}
 		} else {
-			// Se o cabeçalho de autorização não começa com "Bearer ", envia uma resposta
-			// com status 401
+
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			PrintWriter writer = response.getWriter();
 			writer.write("Autorização inválida.");

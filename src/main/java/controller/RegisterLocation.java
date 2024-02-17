@@ -13,6 +13,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import model.Evaluation;
 import model.Event;
 import model.Location;
 import model.Owner;
@@ -54,14 +55,24 @@ public class RegisterLocation extends HttpServlet {
 			System.out.println(token);
 			User u = new User();
 			u = u.findUserByToken(token);
-			
+			System.out.println(u.getEmail());
+			Evaluation evaluation = new Evaluation();
+			List<Evaluation> e = new ArrayList<>();
+			e = evaluation.consultEvaluationByUser(u);
+			for (Evaluation evalu : e) {
+			    System.out.println("ID: " + evalu.getId());
+			    System.out.println("Note: " + evalu.getNote());
+			    System.out.println("User: " + evalu.getUser().getId());
+			    System.out.println("Location: " + evalu.getLocation().getId());
+			    System.out.println("--------------------");
+			}
 			response.setContentType("application/json;charset=UTF-8");
 			PrintWriter out = response.getWriter();
 			List<Location> locations = new ArrayList<>();
 			Location l = new Location();
 			locations = l.consultAllLocations();
 			String jsonResponse = buildJsonResponse("success", "Usuário possui locais cadastrados",
-					convertLocationsToJson(locations));
+					convertLocationsToJson(locations, e));
 			System.out.println(jsonResponse);
 			out.println(jsonResponse);
 		} else {
@@ -176,25 +187,43 @@ public class RegisterLocation extends HttpServlet {
 		return jsonResponse;
 	}
 
-	public static String convertLocationsToJson(List<Location> locations) {
+	public static String convertLocationsToJson(List<Location> locations, List<Evaluation> evaluations) {
 		StringBuilder jsonBuilder = new StringBuilder("[");
 		boolean first = true;
-
+		
+		
+		
 		for (Location location : locations) {
 			if (!first) {
 				jsonBuilder.append(",");
 			} else {
 				first = false;
 			}
-
+			
+			boolean hasEvaluation = evaluations.stream()
+	                .anyMatch(evaluation -> evaluation.getLocation().getId().equals(location.getId()));
+			String locationEvaluation = hasEvaluation ? "true" : "false";
+			
+			double evaluatorNote = hasEvaluation ?
+			        evaluations.stream()
+	                .filter(evaluation -> evaluation.getLocation().getId().equals(location.getId()))
+	                .findFirst()
+	                .map(Evaluation::getNote)
+	                .orElse(0.0) :
+	        0.0;
+			String evaluatorNoteFormatted = String.format("%.2f", evaluatorNote); 
+			System.out.println("EvaluationNote:" + evaluatorNote);
+			System.out.println("True:" + hasEvaluation);
 			double note = location.getAcessibilityNote();
 			int quantity = location.getQuantityOfEvaluation();
-			String formattedNote = String.format("%.2f", note); // Format to 2 decimal places
+			String formattedNote = String.format("%.2f", note); 
 			String quantityAsString = String.valueOf(quantity);
 			jsonBuilder.append("{").append("\"id\":" + location.getId() + ",")
 					.append("\"publicPlace\":\"" + escapeJsonString(location.getPublicPlace()) + "\",")
 					.append("\"neighborhood\":\"" + escapeJsonString(location.getNeighborhood()) + "\",")
 					.append("\"acessibilityNote\":\"" + escapeJsonString(formattedNote) + "\",")
+					.append("\"locationEvaluation\":\"" + escapeJsonString(locationEvaluation) + "\",")
+					.append("\"noteEvaluation\":\"" + escapeJsonString(evaluatorNoteFormatted) + "\",")
 					.append("\"quantityOfEvaluation\":\"" + escapeJsonString(quantityAsString) + "\",")
 					.append("\"city\":\"" + escapeJsonString(location.getCity()) + "\",")
 					.append("\"uf\":\"" + escapeJsonString(location.getUf()) + "\",")

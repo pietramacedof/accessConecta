@@ -4,17 +4,19 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.sql.ResultSet;
 
+import model.Evaluation;
 import model.Event;
 import model.Location;
 import model.Owner;
 import model.Restaurant;
 import model.Store;
+import model.User;
 
 public class LocationDAO {
 
@@ -398,8 +400,7 @@ public class LocationDAO {
 		// Criar e retornar um objeto Restaurant
 		return new Restaurant(resultSet.getString("location_id"), resultSet.getString("location_public_place"),
 				resultSet.getString("location_neighborhood"), resultSet.getString("location_city"),
-				resultSet.getDouble("location_acessibility_note"),
-				resultSet.getInt("location_quantity_of_evaluation"),
+				resultSet.getDouble("location_acessibility_note"), resultSet.getInt("location_quantity_of_evaluation"),
 				resultSet.getString("location_uf"), resultSet.getString("location_place_name"),
 				resultSet.getString("location_cep"), resultSet.getString("location_place_number"), typeOfCuisine,
 				operatingDays);
@@ -442,7 +443,7 @@ public class LocationDAO {
 			statement.setString(1, id);
 			try (ResultSet resultSet = statement.executeQuery()) {
 				if (resultSet.next()) {
-					// Aqui você usaria o método createLocationFromResultSet para construir o objeto
+					// Aqui o método createLocationFromResultSet para construir o objeto
 					// Location
 					// com base nos dados obtidos do ResultSet.
 					location = createLocationFromResultSet(resultSet);
@@ -454,13 +455,12 @@ public class LocationDAO {
 
 	public boolean updateNoteById(Location location, double total, double convertedNote) {
 		String sql = "UPDATE location " + "SET location_acessibility_note = ?, location_quantity_of_evaluation = ?,"
-				+ "location_total_rating = ?"
-				+ "WHERE location_id = ?";
+				+ "location_total_rating = ?" + "WHERE location_id = ?";
 		Connection connection = toConnect();
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 			preparedStatement.setDouble(1, location.getAcessibilityNote());
 			preparedStatement.setInt(2, location.getQuantityOfEvaluation());
-			preparedStatement.setDouble(3, (total+convertedNote));
+			preparedStatement.setDouble(3, (total + convertedNote));
 			preparedStatement.setString(4, location.getId());
 
 			int rowsUpdated = preparedStatement.executeUpdate();
@@ -470,57 +470,90 @@ public class LocationDAO {
 			return false;
 		}
 	}
-	
-	public void insertEvaluation(Integer userId, String locationId, double rating) throws SQLException {
-		  String sql = "INSERT INTO evaluation (evaluation_user_id, evaluation_location_id, evaluation_rating) VALUES (?, ?, ?)";
-		  try (Connection connection = toConnect();
-			   PreparedStatement statement = connection.prepareStatement(sql)) {
-		    statement.setInt(1, userId);
-		    statement.setString(2, locationId);
-		    statement.setDouble(3, rating);
-		    statement.executeUpdate();
-		  }
+
+	public void insertEvaluation(Evaluation e) throws SQLException {
+		String sql = "INSERT INTO evaluation (evaluation_user_id, evaluation_location_id, evaluation_rating) VALUES (?, ?, ?)";
+		try (Connection connection = toConnect(); PreparedStatement statement = connection.prepareStatement(sql)) {
+			statement.setInt(1, e.getUser().getId());
+			statement.setString(2, e.getLocation().getId());
+			statement.setDouble(3, e.getNote());
+			statement.executeUpdate();
+		}
+	}
+
+	public double getLocationTotalRatingById(String id) {
+
+		Connection connection = toConnect();
+
+		PreparedStatement statement = null;
+		ResultSet resultSet = null;
+
+		try {
+
+			String sql = "SELECT location_total_rating FROM location WHERE location_id = ?";
+
+			statement = connection.prepareStatement(sql);
+			statement.setString(1, id);
+			resultSet = statement.executeQuery();
+
+			// Verifique se algum registro foi encontrado
+			if (resultSet.next()) {
+
+				return resultSet.getDouble("location_total_rating");
+			} else {
+
+				return 0.0;
+			}
+		} catch (SQLException e) {
+
+			e.printStackTrace();
+			return 0.0; // Valor padrão em caso de erro
+		} finally {
+
+			try {
+				if (resultSet != null)
+					resultSet.close();
+				if (statement != null)
+					statement.close();
+				if (connection != null)
+					connection.close();
+			} catch (SQLException e) {
+
+				e.printStackTrace();
+			}
+		}
 	}
 	
-	public double getLocationTotalRatingById(String id) {
-		
-		  Connection connection = toConnect();
+	public List<Evaluation> consultEvaluationByUser(User user) {
+        List<Evaluation> evaluations = new ArrayList<>();
+        User userResult = new User();
+        Location locationResult = new Location();
+        try (Connection connection = toConnect()) {
+            String sql = "SELECT evaluation_id, evaluation_rating, evaluation_location_id FROM evaluation WHERE evaluation_user_id = ?";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+                preparedStatement.setInt(1, user.getId());
 
-		  PreparedStatement statement = null;
-		  ResultSet resultSet = null;
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    while (resultSet.next()) {
+                        String id = resultSet.getString("evaluation_id");
+                        double note = resultSet.getDouble("evaluation_rating");
+                        String locationId = resultSet.getString("evaluation_location_id");
 
-		  try {
-		    
-		    String sql = "SELECT location_total_rating FROM location WHERE location_id = ?";
+                        
+                         userResult = user;
+                         locationResult = consultLocationById(locationId);
 
-		   
-		    statement = connection.prepareStatement(sql);
-		    statement.setString(1, id);
-		    resultSet = statement.executeQuery();
+                        Evaluation evaluation = new Evaluation(id, note, userResult, locationResult);
+                        evaluations.add(evaluation);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Trate a exceção de maneira apropriada para o seu aplicativo
+        }
 
-		    // Verifique se algum registro foi encontrado
-		    if (resultSet.next()) {
-		      
-		      return resultSet.getDouble("location_total_rating");
-		    } else {
-		     
-		      return 0.0;
-		    }
-		  } catch (SQLException e) {
-		    
-		    e.printStackTrace();
-		    return 0.0; // Valor padrão em caso de erro
-		  } finally {
-		    
-		    try {
-		      if (resultSet != null) resultSet.close();
-		      if (statement != null) statement.close();
-		      if (connection != null) connection.close();
-		    } catch (SQLException e) {
-		      
-		      e.printStackTrace();
-		    }
-		  }
-		}
+        return evaluations;
+    }
+
 
 }

@@ -1,6 +1,8 @@
 package model;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class User {
 
@@ -11,6 +13,22 @@ public class User {
 	private String watchword;
 	private Integer userType;
 	private String token;
+	
+	public User findUserByToken(String token) {
+		UserDAO dao = new UserDAO();
+		return dao.findUserByToken(token);
+	}
+
+	
+	public boolean toAlterPassword (User user, String password) throws SQLException {
+		UserDAO dao = new UserDAO();
+		if(dao.toAlterPassword(user, password)) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
 
 	public User() {
 
@@ -97,19 +115,4 @@ public class User {
 		this.token = token;
 	}
 	
-	public User findUserByToken(String token) {
-		UserDAO dao = new UserDAO();
-		return dao.findUserByToken(token);
-	}
-
-	
-	public boolean toAlterPassword (User user, String password) throws SQLException {
-		UserDAO dao = new UserDAO();
-		if(dao.toAlterPassword(user, password)) {
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
 }
