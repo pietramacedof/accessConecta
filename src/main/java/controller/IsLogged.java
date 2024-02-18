@@ -38,7 +38,6 @@ public class IsLogged extends HttpServlet {
 		user = user.findUserByToken(token);
 		response.setContentType("application/json;charset=UTF-8");
 		PrintWriter out = response.getWriter();
-		System.out.println("Tipo:" + user.getUserType());
 		if(user != null) {
 			if(user.getUserType() == 1) {
 				System.out.println("Entrou no owner");

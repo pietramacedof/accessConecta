@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 
 <head>
 <meta charset="UTF-8">
@@ -24,8 +24,7 @@
 				<div>
 					<img class="logo" id="logo-light"
 						src="assets/access-conecta-invert.png" style="display: none;"
-						alt="Logo">
-					<img class="logo" id="logo-dark"
+						alt="Logo"> <img class="logo" id="logo-dark"
 						src="assets/access-conecta.png" alt="Logo">
 				</div>
 				<div class="menu-header">
@@ -51,8 +50,8 @@
 						normas da ABNT, assegurando que locais públicos atendam a
 						critérios técnicos estabelecidos para assegurar a acessibilidade a
 						todas as pessoas.</p>
-					<a href="owner.html"><button> Acesse Agora</button></a>
-					
+					<a href="owner.html"><button>Acesse Agora</button></a>
+
 				</div>
 				<div class="img-initial">
 					<img src="assets/access-conecta-logo(2).png" alt="">
@@ -142,11 +141,59 @@
 			</div>
 		</div>
 	</section>
-	<section id="standart" class="standart">
-		<div class="div-standart">
+	<section id="standard" class="standard">
+		<div class="div-standard">
 			<h3>
-				<span>Norma ABNT</span> NBR 9050:2020
+				<span>Norma ABNT <br></span> NBR 9050:2020
 			</h3>
+			<div class="horizontal-line"></div>
+			<div id="carousel-container">
+				<div id="image-carousel">
+					<div class="slide active">
+						<div class="top row">
+							<h4>Introdução</h4>
+							<i class="fa-solid fa-book"></i>
+						</div>
+						<p>Foi publicada no dia 3 de agosto de 2020 a Norma ABNT NBR
+							9050/2020 que trata sobre Acessibilidade a edificações,
+							mobiliário, espaços e equipamentos urbanos e estabelece critérios
+							e parâmetros técnicos a serem observados quanto ao projeto,
+							construção, instalação e adaptação do meio urbano e rural, e de
+							edificações às condições de acessibilidade.</p>
+					</div>
+					<div class="slide">
+						<div class="top row">
+							<h4>Sobre</h4>
+							<i class="fa-solid fa-receipt"></i>
+						</div>
+						<p>No estabelecimento desses critérios e parâmetros técnicos
+							foram consideradas diversas condições de mobilidade e de
+							percepção do ambiente, com ou sem a ajuda de aparelhos, como
+							próteses, cadeiras de rodas, bengalas de rastreamento, sistemas
+							assistivos de audição ou qualquer outro que venha a complementar
+							necessidades individuais.</p>
+					</div>
+					<div class="slide">
+						<div class="top row">
+							<h4>Objetivos</h4>
+							<i class="fa-solid fa-bullseye"></i>
+						</div>
+						<p>Esta Norma visa proporcionar a utilização de maneira
+							autônoma, independente e segura do ambiente, edificações,
+							mobiliário, equipamentos urbanos e elementos à maior quantidade
+							possível de pessoas, independentemente de idade, estatura ou
+							limitação de mobilidade ou percepção.</p>
+					</div>
+
+					<div class="line"></div>
+				</div>
+			</div>
+			<div class="horizontal-line"></div>
+			<div id="button-container">
+				<button id="prev-btn" onclick="prevSlide()">‹</button>
+				<button id="next-btn" onclick="nextSlide()">›</button>
+			</div>
+		</div>
 		</div>
 	</section>
 	<section class="footer">
@@ -165,71 +212,83 @@
 			</div>
 		</footer>
 	</section>
-	 <!-- Modal de Cadastro -->
-    <div id="registerModal" class="modal">
-        <div class="modal-container">
-            <span class="close" id="closeModalBtn">&times;</span>
+	<!-- Modal de Cadastro -->
+	<div id="registerModal" class="modal">
+		<div class="modal-container">
+			<span class="close" id="closeModalBtn">&times;</span>
 
-            <!-- Formulário de Cadastro -->
-            <form id="registerForm" class="input-container">
-                <!-- Adicione os campos do formulário aqui -->
-                <h2>Cadastro</h2>
-                <div class="input-group input-group-sm mb-3">
-                    <span class="input-group-text" id="inputGroup-sizing-sm"><i
-                            class="fa-regular fa-user"></i></i></span>
-                    <input type="text" id="firstName" class="form-control" aria-label="Sizing example input"
-                        placeholder="Nome" aria-describedby="inputGroup-sizing-sm">
-                </div>
+			<!-- Formulário de Cadastro -->
+			<form id="registerForm" class="input-container">
+				<!-- Adicione os campos do formulário aqui -->
+				<h2>Cadastro</h2>
+				<div class="input-group input-group-sm mb-3">
+					<span class="input-group-text" id="inputGroup-sizing-sm"><i
+						class="fa-regular fa-user"></i></i></span> <input type="text" id="firstName"
+						class="form-control" aria-label="Sizing example input"
+						placeholder="Nome" aria-describedby="inputGroup-sizing-sm">
+				</div>
 
-                <div class="input-group input-group-sm mb-3">
-                    <span class="input-group-text" id="inputGroup-sizing-sm"><i
-                            class="fa-regular fa-user"></i></i></span>
-                    <input type="text" id="lastName" class="form-control" aria-label="Sizing example input"
-                        placeholder="Sobrenome" aria-describedby="inputGroup-sizing-sm">
-                </div>
+				<div class="input-group input-group-sm mb-3">
+					<span class="input-group-text" id="inputGroup-sizing-sm"><i
+						class="fa-regular fa-user"></i></i></span> <input type="text" id="lastName"
+						class="form-control" aria-label="Sizing example input"
+						placeholder="Sobrenome" aria-describedby="inputGroup-sizing-sm">
+				</div>
 
-                <div class="input-group input-group-sm mb-3">
-                    <span class="input-group-text" id="inputGroup-sizing-sm"><i
-                            class="fa-regular fa-envelope"></i></span>
-                    <input type="text" id="email" class="form-control" aria-label="Sizing example input"
-                        placeholder="E-mail" aria-describedby="inputGroup-sizing-sm">
-                </div>
+				<div class="input-group input-group-sm mb-3">
+					<span class="input-group-text" id="inputGroup-sizing-sm"><i
+						class="fa-regular fa-envelope"></i></span> <input type="text" id="email"
+						class="form-control" aria-label="Sizing example input"
+						placeholder="E-mail" aria-describedby="inputGroup-sizing-sm">
+				</div>
 
-                <div class="input-group input-group-sm mb-3">
-                    <span class="input-group-text" id="inputGroup-sizing-sm"><i class="fa-regular fa-eye"
-                            id="togglePassword"></i></span>
-                    <input type="password" class="form-control" id="password" aria-label="Sizing example input"
-                        placeholder="Senha" aria-describedby="inputGroup-sizing-sm">
-                </div>
+				<div class="input-group input-group-sm mb-3">
+					<span class="input-group-text" id="inputGroup-sizing-sm"><i
+						class="fa-regular fa-eye" id="togglePassword"></i></span> <input
+						type="password" class="form-control" id="password"
+						aria-label="Sizing example input" placeholder="Senha"
+						aria-describedby="inputGroup-sizing-sm">
+				</div>
 
-                <div>
-                    <input type="radio" class="userType" id="owner" name="userType" value="owner">
-                    <label class="label-input-radio" for="owner">Proprietário</label>
+				<div class='flex-user-type'>
 
-                    <input type="radio" class="userType" id="evaluator" name="userType" value="evaluator">
-                    <label class="label-input-radio" for="owner">Avaliador</label>
-                </div>
+					<div class="input-group-text">
+						<input type="radio" class="userType" id="owner" name="userType"
+							value="owner"> <label class="label-input-radio"
+							for="owner">Proprietário</label>
+					</div>
+					<div class="input-group-text">
+						<input type="radio" class="userType" id="evaluator"
+							name="userType" value="evaluator"> <label
+							class="label-input-radio" for="evaluator">Avaliador</label>
+					</div>
+				</div>
 
+				<p id="p-age" style="display: none;">Data de Nascimento:</p>
+				<div class="input-group input-group-sm mb-3">
+					<input type="date" id="age" class="form-control"
+						style="display: none;" min="1"
+						aria-describedby="inputGroup-sizing-sm">
+				</div>
 
+				<div id='contentTypeOfDisability'
+					class="input-group input-group-sm mb-3" style="display: none">
+					<span class="input-group-text" id="inputGroup-sizing-sm"> <i
+						class="fa-brands fa-accessible-icon"></i>
+					</span> <input type="text" id="typeOfDisability" class="form-control"
+						aria-label="Sizing example input"
+						placeholder="Tipo de Deficiência"
+						aria-describedby="inputGroup-sizing-sm">
+				</div>
 
-                <p id="p-age" style="display: none;">Data de Nascimento:</p>
-                <div class="input-group input-group-sm mb-3">
-                    <input type="date" id="age" class="form-control" style="display: none;" min="1"
-                        aria-describedby="inputGroup-sizing-sm">
-                </div>
-
-
-                <input type="text" id="typeOfDisability" style="display: none;" placeholder="typeOfDisability">
-
-
-                <button type="submit" class="button-register" value="submit">Cadastrar</button>
-                <p>Já possui conta? <a href="#loginModal" id="redirectLogin" >Conecte-se</a></p>
-
-            </form>
-        </div>
-    </div>
-    <div>
-    </div>
+				<button type="submit" class="button-register" value="submit">Cadastrar</button>
+				<p>
+					Já possui conta? <a href="#loginModal" id="redirectLogin">Conecte-se</a>
+				</p>
+			</form>
+		</div>
+	</div>
+	<div></div>
 
 	<div id="loginModal" class="modal">
 		<div class="modal-content-login">
@@ -237,17 +296,18 @@
 				<img src="assets/20945083-login.png" alt="">
 			</div>
 			<div class="modal-login-info">
-				<span class="close" id="closeLogin">&times;</span> 
-				<img id="logo-login" style="display: none;" width="100px" src="assets/access-conecta-invert.png" alt="">
-				<img id="logo-login-dark" width="100px" src="assets/access-conecta.png" alt="">
-				
+				<span class="close" id="closeLogin">&times;</span> <img
+					id="logo-login" style="display: none;" width="100px"
+					src="assets/access-conecta-invert.png" alt=""> <img
+					id="logo-login-dark" width="100px" src="assets/access-conecta.png"
+					alt="">
+
 				<div class="form-login">
 					<h2>Conectar à conta</h2>
 					<form id="formLogin" action="/login" method="post">
 						<div class="input-group input-group-sm mb-3">
 							<span class="input-group-text" id="inputGroup-sizing-sm"><i
-								class="fa-regular fa-envelope"></i></span> 
-								<input type="text"
+								class="fa-regular fa-envelope"></i></span> <input type="text"
 								id="emailLogin" class="form-control"
 								aria-label="Sizing example input" placeholder="E-mail"
 								aria-describedby="inputGroup-sizing-sm">
@@ -255,15 +315,16 @@
 
 						<div class="input-group input-group-sm mb-3">
 							<span class="input-group-text" id="inputGroup-sizing-sm"><i
-								class="fa-regular fa-eye" id="loginPassword"></i></span> 
-								<input
+								class="fa-regular fa-eye" id="loginPassword"></i></span> <input
 								type="password" class="form-control" id="watchwordLogin"
 								aria-label="Sizing example input" placeholder="Senha"
 								aria-describedby="inputGroup-sizing-sm">
 						</div>
 						<input class="submit-login" id="submitLogin" type="submit"
 							value="Login">
-						<p>Não tem uma conta? <a id="signUp" href="#registerModal">Inscrever-se</a></p>
+						<p>
+							Não tem uma conta? <a id="signUp" href="#registerModal">Inscrever-se</a>
+						</p>
 					</form>
 				</div>
 

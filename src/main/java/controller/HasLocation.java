@@ -122,13 +122,15 @@ public class HasLocation extends HttpServlet {
 
 			double note = location.getAcessibilityNote();
 			String formattedNote = String.format("%.2f", note); // Format to 2 decimal places
-
+			int quantity = location.getQuantityOfEvaluation();
+			String quantityAsString = String.valueOf(quantity);
 			jsonBuilder.append("{").append("\"id\":" + location.getId() + ",")
 					.append("\"publicPlace\":\"" + escapeJsonString(location.getPublicPlace()) + "\",")
 					.append("\"acessibilityNote\":\"" + escapeJsonString(formattedNote) + "\",")
 					.append("\"neighborhood\":\"" + escapeJsonString(location.getNeighborhood()) + "\",")
 					.append("\"city\":\"" + escapeJsonString(location.getCity()) + "\",")
 					.append("\"uf\":\"" + escapeJsonString(location.getUf()) + "\",")
+					.append("\"quantityOfEvaluation\":\"" + escapeJsonString(quantityAsString) + "\",")
 					.append("\"placeName\":\"" + escapeJsonString(location.getPlaceName()) + "\",")
 					.append("\"cep\":\"" + escapeJsonString(location.getCep()) + "\",")
 					.append("\"number\":\"" + escapeJsonString(location.getNumber()) + "\"");

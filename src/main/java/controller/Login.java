@@ -82,7 +82,7 @@ public class Login extends HttpServlet {
 						+ "\"email\": \"" + evaluator.getEmail() + "\","
 						+ "\"typeOfDisability\": \"" + evaluator.getTypeOfDisability() + "\","
 						+ "\"userType\": \"" + evaluator.getUserType() + "\","
-						+ "\"token\": \"" + evaluator.getToken() + "\"" // Token adicionado aqui
+						+ "\"token\": \"" + evaluator.getToken() + "\"" 
 						+ "}";
 				out.println(jsonResponseEvaluator);
 			}

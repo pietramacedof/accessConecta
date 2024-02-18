@@ -1,6 +1,6 @@
 
 
-$(document).ready(function() {
+$(document).ready(function () {
 
 	const isLogged = localStorage.getItem('token');
 
@@ -38,7 +38,12 @@ $(document).ready(function() {
 		$('.pageload').hide();
 	});
 
-	$('a[href^="#"]').on('click', function(e) {
+	$('#filterEverthing').click(function () {
+		console.log('show');
+		$('.location-info').show();
+	});
+
+	$('a[href^="#"]').on('click', function (e) {
 		e.preventDefault();
 		var target = this.hash;
 		var $target = $(target);
@@ -46,22 +51,35 @@ $(document).ready(function() {
 		if ($target && $target.length > 0) {
 			$('html, body').stop().delay(800).animate({
 				'scrollTop': $target.offset().top
-			}, 400, 'swing', function() {
+			}, 400, 'swing', function () {
 				window.location.hash = target;
 			});
 		}
 	});
-	$('#liveToastBtn').on('click', function(e) {
+
+
+
+	$('#liveToastBtn').on('click', function (e) {
 		e.preventDefault();
 		console.log("click")
 		$('#liveToast').toast('show');
 	});
 
-	$(function() {
+	$(".locations").on("click", function () {
+		$(".locations").blur();
+	});
+
+	$('#closeSession').click(function () {
+		console.log('caiu');
+		localStorage.clear();
+		window.location.href = './';
+	});
+
+	$(function () {
 		$('[data-toggle="tooltip"]').tooltip()
 	});
 
-	$('#radeButton').on('click', function() {
+	$('#radeButton').on('click', function () {
 		var v = $('#idLocationHidden').val();
 
 		var questionList = (localStorage.getItem('questionList'));
@@ -69,7 +87,7 @@ $(document).ready(function() {
 		var questions = questionList.split(',').map(Number);
 
 		// Usa a função map para adicionar "answer-" a cada elemento
-		var mappedList = questions.map(function(question) {
+		var mappedList = questions.map(function (question) {
 			return 'answer-' + question;
 		});
 
@@ -133,6 +151,139 @@ $(document).ready(function() {
 			});
 	});
 
+	$('body').on('click', '#learnMoreBtn', function () {
+		console.log('entrou');
+		var button = $(event.relatedTarget);
+		var id = $(this).data('id'); 
+		$('#learnMore').modal('show');
+		var locationString = localStorage.getItem('locations');
+		var locationsArray = JSON.parse(locationString);
+		var locationObject;
+		// Encontra o objeto Location com o ID específico
+		locationObject = locationsArray.find(function(location) {
+		return location.id == id;
+		});
+		var address = `${locationObject.publicPlace}, ${locationObject.number}, ${locationObject.neighborhood}, ${locationObject.city}, ${locationObject.uf}`;
+		console.log(locationObject);
+		var individualNote = locationObject.locationEvaluation == 'false' ? "Você não avaliou esse local ainda" : locationObject.noteEvaluation;
+		var p = locationObject.locationEvaluation == 'false' ? "" : "Sua nota para este estabelecimento";
+		 	
+		 	if (locationObject.type == 'restaurant') {
+		console.log(locationObject.id);
+		template =
+			`
+			<div id='more' class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Restaurante ${locationObject.placeName}</h5>
+					<button stype="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+						<div class="learn-more-stars">
+							<div class="star-size">
+								<img class="small" src="assets/285661_star_icon.png" alt="star">
+								<img class="medium" src="assets/285661_star_icon.png" alt="star">
+								<img class="big" src="assets/285661_star_icon.png" alt="star">
+								<img class="medium" src="assets/285661_star_icon.png" alt="star">
+								<img class="small" src="assets/285661_star_icon.png" alt="star">
+							</div>
+							<div class="content-quantity">
+								<p>${locationObject.acessibilityNote}</p>
+								<p>(${locationObject.quantityOfEvaluation})</p>
+							</div>
+						</div>
+						<div class="learn-more-content">
+						<p><strong>Endereço: </strong>${address}</p>
+						<p><strong>Dias de funcionamento: </strong>${locationObject.operatingDays}</p>
+						<p><strong>Tipo de Culinária: </strong>${locationObject.typeOfCuisine}</p>
+						<p><strong>${p} </strong>${individualNote}</p>
+						</div>
+				</div>
+				<div class="modal-footer">
+				</div>
+				</div>`
+	} else if (locationObject.type == 'event') {
+		var start = formateDate(locationObject.startDate);
+		var end = formateDate(locationObject.endDate);
+		console.log(locationObject.id);
+		var price = '';
+		if (locationObject.eventPrice == '2') {
+			price = "Pago";
+		} else {
+			price = 'Gratuito';
+		}
+		template =
+			`
+			<div id='more' class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Evento ${locationObject.placeName}</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+						<div class="learn-more-stars">
+							<div class="star-size">
+								<img class="small" src="assets/285661_star_icon.png" alt="star">
+								<img class="medium" src="assets/285661_star_icon.png" alt="star">
+								<img class="big" src="assets/285661_star_icon.png" alt="star">
+								<img class="medium" src="assets/285661_star_icon.png" alt="star">
+								<img class="small" src="assets/285661_star_icon.png" alt="star">
+							</div>
+							<div class="content-quantity">
+								<p>${locationObject.acessibilityNote}</p>
+								<p>(${locationObject.quantityOfEvaluation})</p>
+							</div>
+						</div>
+						<div class="learn-more-content">
+						<p><strong>Endereço: </strong>${address}</p>
+						<p><strong>Data de Início: </strong>${start}</p>
+						<div class="badge-date">
+							<p><strong>Data de Fim: </strong>${end}</p>
+							<span class="badge badge-primary">${price}</span>
+						</div>
+						<p><strong>${p} </strong>${individualNote}</p>
+						
+						</div>
+				</div>
+				<div class="modal-footer">
+				</div>
+			</div>`
+	} else {
+
+		template =
+			`
+			<div id='more' class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Loja ${locationObject.placeName}</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+						<div class="learn-more-stars">
+							<div class="star-size">
+								<img class="small" src="assets/285661_star_icon.png" alt="star">
+								<img class="medium" src="assets/285661_star_icon.png" alt="star">
+								<img class="big" src="assets/285661_star_icon.png" alt="star">
+								<img class="medium" src="assets/285661_star_icon.png" alt="star">
+								<img class="small" src="assets/285661_star_icon.png" alt="star">
+							</div>
+							<div class="content-quantity">
+								<p>${locationObject.acessibilityNote}</p>
+								<p>(${locationObject.quantityOfEvaluation})</p>
+							</div>
+						</div>
+						<div class="learn-more-content">
+						<p><strong>Endereço: </strong>${address}</p>
+						<p><strong>Dias de funcionamento: </strong>${locationObject.typeProduct}</p>
+						<p><strong>${p} </strong>${individualNote}</p>
+						</div>
+				</div>
+				<div class="modal-footer">
+				</div>
+			</div>`
+	}
+	$('#more').html(template);
+	});
 });
 
 function sendToast(status, message) {
@@ -178,19 +329,18 @@ function resetFields() {
 
 }
 
-$('#toAlterPasswordBtn').on('click', function() {
+$('#toAlterPasswordBtn').on('click', function () {
 	$('#toAlterPassword').modal('show');
 	let firstName = localStorage.getItem('firstName');
 	let lastName = localStorage.getItem('lastName');
 	let userType = localStorage.getItem('userType');
-	let dateOfBirth = localStorage.getItem('dateOfBirth');
+	let result = userType === '1' ? localStorage.getItem('dateOfBirth') : localStorage.getItem('typeOfDisability');
 	let email = localStorage.getItem('email');
 	let token = localStorage.getItem('token');
-
 	$('#userFirstName').val(firstName);
 	$('#userLast').val(lastName);
 	$('#userEmail').val(email);
-	$('#userDateOfBirth').val(dateOfBirth);
+	$('#userDateOfBirth').val(result);
 	$('#userFirstName').prop('disabled', true);
 	$('#userLast').prop('disabled', true);
 	$('#userEmail').prop('disabled', true);
@@ -199,7 +349,7 @@ $('#toAlterPasswordBtn').on('click', function() {
 
 });
 
-$('#confirmToAlterPassword').on('click', function() {
+$('#confirmToAlterPassword').on('click', function () {
 	let password = $('#userPassword').val();
 	let confirmPassword = $('#userConfirmPassword').val();
 	let email = $('#userEmail').val();
@@ -256,7 +406,7 @@ $('#confirmToAlterPassword').on('click', function() {
 
 });
 
-document.getElementById('registerLocation').addEventListener('submit', function(event) {
+document.getElementById('registerLocation').addEventListener('submit', function (event) {
 	event.preventDefault();
 	//checar campos vazios, sessão
 
@@ -336,6 +486,7 @@ document.getElementById('registerLocation').addEventListener('submit', function(
 		city: city,
 		state: state,
 		establishmentType: establishmentType,
+		quantityOfEvaluation: '0'
 	};
 
 	switch (establishmentType) {
@@ -469,14 +620,14 @@ function renderLocations(location, address, mapContainerId, isUpdate) {
 					<i class="fa-solid fa-utensils customIconUtensils"></i>
 				</div>
 				<div class="content-location-info" id='infoLocal'>
+					<div class="content-stars">
+					  <div class="container-star">
+						  <div class="my-rating-${mapContainerId}"></div>
+					  </div>
+					  <p id="pMyRating-${mapContainerId}">(${location.quantityOfEvaluation})</p>
+					</div>
 					<p><strong>Endereço:</strong> ${address}</p>
 					<p><strong>Dias de Abertura:</strong> ${location.operatingDays}</p>
-					<div>
-					<p><strong> Nota: </strong></p>
-					<div>
-						<div class="my-rating-${mapContainerId}"></div>
-					</div>
-					</div>
 				</div>
 				<!-- Adicione um contêiner para o mapa com um ID exclusivo -->
 				<div id="${mapContainerId}" class="map-container" style="height: 200px;"></div>
@@ -492,10 +643,15 @@ function renderLocations(location, address, mapContainerId, isUpdate) {
 		endDateFormate = formateDate(location.endDate);
 		template = `
         	<div class="header-location-info" id="nameLocal"><h2>${location.placeName}</h2>
-			<div class="my-rating-${mapContainerId}"></div>
 			<i class="fa-solid fa-champagne-glasses customIconChampagne"></i>
         	</div>
             <div class="content-location-info" id='infoLocal'>
+			<div class="content-stars">
+					  <div class="container-star">
+						  <div class="my-rating-${mapContainerId}"></div>
+					  </div>
+					  <p id="pMyRating-${mapContainerId}">(${location.quantityOfEvaluation})</p>
+					</div>
             <p><strong>Endereço:</strong> ${address}</p>
             <p><strong>Data de Início:</strong> ${startDateFormate}</p>
             <p><strong>Data de Fim:</strong> ${endDateFormate}</p>
@@ -512,10 +668,15 @@ function renderLocations(location, address, mapContainerId, isUpdate) {
 			`
         	
         	<div class="header-location-info" id="nameLocal"><h2>${location.placeName}</h2>
-			<div class="my-rating-${mapContainerId}"></div>
 			<i class="fa-solid fa-store customIconStore"></i>
         	</div>
             <div class="content-location-info" id='infoLocal'>
+				<div class="content-stars">
+					  <div class="container-star">
+						  <div class="my-rating-${mapContainerId}"></div>
+					  </div>
+					  <p id="pMyRating-${mapContainerId}">(${location.quantityOfEvaluation})</p>
+					</div>
             <p><strong>Endereço:</strong> ${address}</p>
             <p><strong>Tipo de Produto:</strong> ${location.typeProduct}</p>
             </div>
@@ -606,7 +767,7 @@ function customCloseModal(id) {
 	$('.modal-backdrop').remove();
 }
 
-$('#toAlterButton').on('click', function() {
+$('#toAlterButton').on('click', function () {
 	var locationName = $('#name').val();
 	var postalCode = $('#postalCode').val();
 	var street = $('#publicPlace').val();
@@ -807,7 +968,7 @@ function checkUserHasLocation(token) {
 				const locations = response.data.locations;
 				$('#noLocationInfo').hide();
 				$('#hasLocationSection').show();
-				setTimeout(function() {
+				setTimeout(function () {
 
 
 					locations.map((location, index) => {
@@ -840,7 +1001,7 @@ function initMap(address, mapContainerId) {
 	const enderecoCadastrado = address;
 	const geocoder = new google.maps.Geocoder();
 
-	geocoder.geocode({ address: enderecoCadastrado }, function(results, status) {
+	geocoder.geocode({ address: enderecoCadastrado }, function (results, status) {
 		if (status === "OK") {
 			const latitude = results[0].geometry.location.lat();
 			const longitude = results[0].geometry.location.lng();
@@ -871,7 +1032,7 @@ function initMap(address, mapContainerId) {
 				clickable: true,
 			});
 
-			marker.addListener("click", function() {
+			marker.addListener("click", function () {
 				const url = `https://www.google.com/maps?q=${latitude},${longitude}`;
 				window.open(url, "_blank");
 			});
@@ -882,7 +1043,9 @@ function initMap(address, mapContainerId) {
 }
 
 function filterType(type) {
-	var locations = JSON.parse(localStorage.getItem('dataLocation'));
+	let data = localStorage.getItem('userType') == '1' ? JSON.parse(localStorage.getItem('dataLocation')) : JSON.parse(localStorage.getItem('locations'));
+	var locations = data;
+	console.log(locations);
 	$('.location-info').hide();
 	var filter = locations.filter((location, index) => location.type == type);
 	filter.map((location, index) => {
@@ -892,24 +1055,9 @@ function filterType(type) {
 		;
 };
 
-function showAll() {
-	$('.location-info').show();
-}
-
-var buttonClearFilter = $('#filterEverthing');
-buttonClearFilter.click(showAll);
-
 function generateRandomId() {
 	return Math.random().toString(36).substring(2, 15);
 }
-
-
-document.getElementById('closeSession').addEventListener('click', function() {
-	console.log('caiu');
-	localStorage.clear();
-	window.location.href = './';
-
-});
 
 function loadLocations(isLogged) {
 	console.log('loadLocations');
@@ -927,7 +1075,7 @@ function loadLocations(isLogged) {
 				localStorage.setItem('locations', JSON.stringify(response.data.locations));
 				const locations = response.data.locations;
 
-				setTimeout(function() {
+				setTimeout(function () {
 
 
 					locations.map((location, index) => {
@@ -955,50 +1103,39 @@ function loadLocations(isLogged) {
 		});
 }
 
-function learnMore(id) {
-
-
-
-	const myModal = document.getElementById('learnMore');
-	// Suponha que 'locationId' é a chave que você usou para armazenar o objeto Location no localStorage
-	var locationId = id;
-
-	var locationString = localStorage.getItem('locations');
-
-	// Converte a string JSON para um array de objetos JavaScript
-	var locationsArray = JSON.parse(locationString);
-
-
-	// Encontra o objeto Location com o ID específico
-	var locationObject = locationsArray.find(function(location) {
-		return location.id == id;
-	});
-
-	console.log(locationObject);
-
-	const bootstrapModal = new bootstrap.Modal(myModal);
-	bootstrapModal.show();
-	const modalTitle = document.querySelector('.modal-title');
-
-	const template =
+function createModalContent(locationObject, address) {
+	var template =
 		`
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title">OI, EU SOU UMA IA BURRA</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal"
-						aria-label="Close"></button>
-				</div>
-				<input type="hidden" id="idLocationHidden">
-				<div class="modal-body" id="questions">
-					<p>Deu certo, essa coisa</p>
-				</div>
-				<div class="modal-footer">
-					<button id="radeButton" type="button" class="btn btn-primary">Deletar</button>
-				</div>
-			</div>`
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">${locationObject.placeName}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="learn-more-stars">
+                <img src="assets/285661_star_icon.png" alt="star">
+                <p>${locationObject.acessibilityNote}</p>
+            </div>
+            <div class="learn-more-content">
+                <p><strong>Endereço: </strong>${locationObject.address}</p>
+
+                ${locationObject.type == 'restaurant' ? `
+                    <p><strong>Dias de funcionamento: </strong>${locationObject.operatingDays}</p>
+                    <p><strong>Tipo de Culinária: </strong>${locationObject.typeOfCuisine}</p>
+                ` : locationObject.type == 'event' ? `
+                    <p><strong>Data de início: </strong>${locationObject.startDate}</p>
+                    <p><strong>Data de fim: </strong>${locationObject.endDate}</p>
+                    <span class="badge badge-primary">${locationObject.eventPrice == '2' ? 'Pago' : 'Gratuito'}</span>
+                ` : `
+                    <p><strong>Tipo de Produto: </strong>${locationObject.typeProduct}</p>
+                `}
+            </div>
+        </div>
+        <div class="modal-footer">
+        </div>
+    </div>`;
 
 	$('#learnMore').html(template);
-
 }
 
 function renderLocationsEvaluator(location, address, mapContainerId) {
@@ -1034,7 +1171,7 @@ function renderLocationsEvaluator(location, address, mapContainerId) {
             <div id="${mapContainerId}" class="map-container" style="height: 200px;"></div>
             <div class="btn-section">
                 <button id="buttonEvaluate${mapContainerId}" class="btn btn-primary" onClick="evaluateLocation(${mapContainerId})" ${disableButton}>Avaliar</button>
-                <button class="btn btn-info" onClick="learnMore(${mapContainerId})">Saiba mais</button>
+                <button id="learnMoreBtn" class="btn btn-info" data-toggle="modal" data-id="${mapContainerId}">Saiba mais</button>
             </div>
         `;
 	}
@@ -1062,7 +1199,7 @@ function renderLocationsEvaluator(location, address, mapContainerId) {
             <div class="btn-section">
                 <button id="buttonEvaluate${mapContainerId}" class="btn btn-primary" onClick="evaluateLocation(${mapContainerId})" ${disableButton}>Avaliar</button>
 
-				<button class="btn btn-info" onClick="learnMore(${mapContainerId})">Saiba mais</button>
+				<button id="learnMoreBtn" class="btn btn-info" data-toggle="modal" data-id="${mapContainerId}">Saiba mais</button>
             </div>
         `;
 	}
@@ -1086,7 +1223,7 @@ function renderLocationsEvaluator(location, address, mapContainerId) {
             <div id="${mapContainerId}" class="map-container" style="height: 200px;"></div>
             <div class="btn-section">
                 <button id="buttonEvaluate${mapContainerId}" class="btn btn-primary" onClick="evaluateLocation(${mapContainerId})" ${disableButton}>Avaliar</button>
-				<button class="btn btn-info" onClick="learnMore(${mapContainerId})">Saiba mais</button>
+				<button id="learnMoreBtn" class="btn btn-info" data-toggle="modal" data-id="${mapContainerId}">Saiba mais</button>
             </div>
         `;
 	}
