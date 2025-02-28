@@ -57,6 +57,7 @@
 					<img src="assets/access-conecta-logo(2).png" alt="">
 				</div>
 			</div>
+			
 			<div class="explore">
 				<div class="option">
 					<h4>Local</h4>
@@ -87,6 +88,7 @@
 					</p>
 				</div>
 			</div>
+
 			<div class="things-containers">
 				<div class="containers">
 					<div class="subject">
@@ -220,7 +222,7 @@
 			<!-- Formulário de Cadastro -->
 			<form id="registerForm" class="input-container">
 				<!-- Adicione os campos do formulário aqui -->
-				<h2>Cadastro</h2>
+				<h2>Criar conta</h2>
 				<div class="input-group input-group-sm mb-3">
 					<span class="input-group-text" id="inputGroup-sizing-sm"><i
 						class="fa-regular fa-user"></i></i></span> <input type="text" id="firstName"
@@ -250,36 +252,41 @@
 						aria-describedby="inputGroup-sizing-sm">
 				</div>
 
-				<div class='flex-user-type'>
-
-					<div class="input-group-text">
+				<div class='input-group mb-3 flex-user-type'>
+					<div class="input-group-text" id='userRadio'>
 						<input type="radio" class="userType" id="owner" name="userType"
 							value="owner"> <label class="label-input-radio"
 							for="owner">Proprietário</label>
 					</div>
-					<div class="input-group-text">
+					<div class="input-group-text" id='userRadio'>
 						<input type="radio" class="userType" id="evaluator"
 							name="userType" value="evaluator"> <label
 							class="label-input-radio" for="evaluator">Avaliador</label>
 					</div>
 				</div>
 
-				<p id="p-age" style="display: none;">Data de Nascimento:</p>
-				<div class="input-group input-group-sm mb-3">
-					<input type="date" id="age" class="form-control"
-						style="display: none;" min="1"
-						aria-describedby="inputGroup-sizing-sm">
+				<div id="p-age" style='display: none'>
+					<label class="form-label" for="age">Data de Nascimento:</label>
+					<div class="input-group input-group-sm mb-3">
+						<span class="input-group-text"> <i
+							class="fa-solid fa-calendar-days"></i>
+						</span><input style='width: 222px' type="date" class="form-control"
+							id="age" aria-label="Data de nascimento"
+							aria-describedby="inputGroup-sizing-sm" />
+					</div>
 				</div>
 
-				<div id='contentTypeOfDisability'
-					class="input-group input-group-sm mb-3" style="display: none">
-					<span class="input-group-text" id="inputGroup-sizing-sm"> <i
-						class="fa-brands fa-accessible-icon"></i>
-					</span> <input type="text" id="typeOfDisability" class="form-control"
-						aria-label="Sizing example input"
-						placeholder="Tipo de Deficiência"
-						aria-describedby="inputGroup-sizing-sm">
+				<div id='contentTypeOfDisability' style='display: none'>
+					<div class="input-group input-group-sm">
+						<span class="input-group-text"> <i
+							class="fa-brands fa-accessible-icon"></i>
+						</span> <input type="text" id="typeOfDisability" class="form-control"
+							aria-label="Sizing example input"
+							placeholder="Tipo de Deficiência"
+							aria-describedby="inputGroup-sizing-sm" style="width: 226px;">
+					</div>
 				</div>
+
 
 				<button type="submit" class="button-register" value="submit">Cadastrar</button>
 				<p>
@@ -343,12 +350,23 @@
 		</div>
 	</div>
 
+	<div vw class="enabled">
+        <div vw-access-button class="active"></div>
+        <div vw-plugin-wrapper>
+          <div class="vw-plugin-top-wrapper"></div>
+          
+        </div>
+        
 
 	<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 	<script
 		src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 	<script
 		src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
+	<script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+	<script>
+		new window.VLibras.Widget('https://vlibras.gov.br/app');
+	</script>
 	<script src="userData.js"></script>
 	<script src="script.js"></script>
 </body>

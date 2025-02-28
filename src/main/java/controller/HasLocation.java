@@ -1,17 +1,19 @@
 package controller;
 
 import jakarta.servlet.ServletException;
+
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import model.Evaluator;
 import model.Event;
 import model.Location;
 import model.Owner;
 import model.Restaurant;
 import model.Store;
 import model.User;
-import model.UserDAO;
+import model.dao.UserDAO;
 import model.dao.LocationDAO;
 
 import java.io.IOException;
@@ -46,8 +48,8 @@ public class HasLocation extends HttpServlet {
 		double note = Double.parseDouble(noteStr);
 		String id = request.getParameter("id");
 		String token = request.getParameter("token");
-		User u = new User();
-		u = u.findUserByToken(token);
+		Evaluator u = new Evaluator();
+		u = u.findEvaluatorByToken(token);
 		System.out.println(u.getId() + u.getFirstName());
 		Location location = new Location();
 		try {

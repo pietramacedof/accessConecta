@@ -1,6 +1,10 @@
 package controller;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+
+
+
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -14,14 +18,18 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import model.Evaluation;
+import model.Evaluator;
 import model.Event;
 import model.Location;
 import model.Owner;
 import model.Restaurant;
 import model.Store;
 import model.User;
-import model.UserDAO;
+import model.dao.UserDAO;
 import model.dao.LocationDAO;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
 
 /**
  * Servlet implementation class RegisterLocation
@@ -50,11 +58,12 @@ public class RegisterLocation extends HttpServlet {
 			throws ServletException, IOException {
 		String authHeader = request.getHeader("Authorization");
 		String token = null;
+		PrintWriter out = response.getWriter();
 		if (authHeader != null && authHeader.startsWith("Bearer ")) {
 			token = authHeader.substring(7);
 			System.out.println(token);
-			User u = new User();
-			u = u.findUserByToken(token);
+			Evaluator u = new Evaluator();
+			u = u.findEvaluatorByToken(token);
 			System.out.println(u.getEmail());
 			Evaluation evaluation = new Evaluation();
 			List<Evaluation> e = new ArrayList<>();
@@ -67,41 +76,60 @@ public class RegisterLocation extends HttpServlet {
 			    System.out.println("--------------------");
 			}
 			response.setContentType("application/json;charset=UTF-8");
-			PrintWriter out = response.getWriter();
 			List<Location> locations = new ArrayList<>();
 			Location l = new Location();
 			locations = l.consultAllLocations();
-			String jsonResponse = buildJsonResponse("success", "Usuário possui locais cadastrados",
+			String jsonResponse = buildJsonResponse("success", "Operação bem-sucedida",
 					convertLocationsToJson(locations, e));
 			System.out.println(jsonResponse);
 			out.println(jsonResponse);
 		} else {
-			// Se o cabeçalho de autorização não começa com "Bearer ", envia uma resposta
-			// com status 401
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			response.setContentType("application/json;charset=UTF-8");
 			PrintWriter writer = response.getWriter();
-			writer.write("Autorização inválida.");
+			String jsonResponse = "{\"status\": \"error\", \"message\": \"Sem autorização\"}";
+		    out.println(jsonResponse);
+		    return; 
 		}
 
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		response.setContentType("application/json;charset=UTF-8");
 		String token = request.getHeader("Authorization");
+		PrintWriter out = response.getWriter();
 
 		token = token != null && token.startsWith("Bearer ") ? token.substring(7) : token;
+		
+		if (token == null || token.isEmpty()) {
+			response.setStatus(HttpServletResponse.SC_FORBIDDEN); 
+		    String jsonResponse = "{\"status\": \"error\", \"message\": \"Sem autorização\"}";
+		    out.println(jsonResponse);
+		    return; 
+		}
+		
+		StringBuilder jsonReceived = new StringBuilder();
+	    String line;
+	    try (BufferedReader reader = request.getReader()) {
+	        while ((line = reader.readLine()) != null) {
+	            jsonReceived.append(line);
+	        }
+	    }
+	    
+	    Gson gson = new Gson();
+	    JsonObject jsonObject = gson.fromJson(jsonReceived.toString(), JsonObject.class);
+	    String locationName = jsonObject.get("locationName").getAsString();
+	    String postalCode = jsonObject.get("postalCode").getAsString();
+	    String street = jsonObject.get("street").getAsString();
+	    String neighborhood = jsonObject.get("neighborhood").getAsString();
+	    String number = jsonObject.get("number").getAsString();
+	    String city = jsonObject.get("city").getAsString();
+	    String state = jsonObject.get("state").getAsString();
+		String establishmentType = jsonObject.get("establishmentType").getAsString();
+		
 		Owner owner = udao.findOwnerByToken(token);
-		String locationName = request.getParameter("locationName");
-		String postalCode = request.getParameter("postalCode");
-		String street = request.getParameter("street");
-		String neighborhood = request.getParameter("neighborhood");
-		String number = request.getParameter("number");
-		String city = request.getParameter("city");
-		String state = request.getParameter("state");
-		System.out.println(state + city + number);
-		String establishmentType = request.getParameter("establishmentType");
-		response.setContentType("application/json;charset=UTF-8");
-		PrintWriter out = response.getWriter();
+		
 		if (dao.existLocation(postalCode, street, number, city, state)) {
 			String jsonResponse = "{\"status\": \"error\", \"message\": \"O endereço informado já está cadastrado.\"}";
 			out.println(jsonResponse);
@@ -111,8 +139,8 @@ public class RegisterLocation extends HttpServlet {
 		System.out.println("Informações do local:" + locationName + ", " + postalCode + ", " + street + ", "
 				+ neighborhood + ", " + number + ", " + city + ", " + state + ", " + establishmentType);
 		if (establishmentType.equalsIgnoreCase("restaurant")) {
-			String cuisineType = request.getParameter("cuisineType");
-			String operatingDays = request.getParameter("operatingDays");
+			String cuisineType = jsonObject.get("cuisineType").getAsString();
+			String operatingDays = jsonObject.get("operatingDays").getAsString();
 
 			Restaurant restaurant = new Restaurant(street, neighborhood, city, state, locationName, postalCode, number,
 					cuisineType, operatingDays);
@@ -123,9 +151,9 @@ public class RegisterLocation extends HttpServlet {
 					+ id + "}";
 			out.println(jsonResponse);
 		} else if (establishmentType.equalsIgnoreCase("event")) {
-			String startDateStr = request.getParameter("startDate");
-			String endDateStr = request.getParameter("endDate");
-			String eventPrice = request.getParameter("eventPrice");
+			String startDateStr = jsonObject.get("startDate").getAsString();
+			String endDateStr = jsonObject.get("endDate").getAsString();
+			String eventPrice = jsonObject.get("eventPrice").getAsString();
 
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 			Date startDate = null;
@@ -153,7 +181,7 @@ public class RegisterLocation extends HttpServlet {
 			out.println(jsonResponse);
 
 		} else {
-			String productType = request.getParameter("productType");
+			String productType = jsonObject.get("productType").getAsString();
 
 			Store store = new Store(street, neighborhood, city, state, locationName, postalCode, number, productType);
 
@@ -167,11 +195,30 @@ public class RegisterLocation extends HttpServlet {
 
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		String locationId = request.getParameter("id");
-		System.out.println(locationId);
 		response.setContentType("application/json;charset=UTF-8");
 		PrintWriter out = response.getWriter();
 		Location location = new Location();
+		String token = request.getHeader("Authorization");
+		
+		token = token != null && token.startsWith("Bearer ") ? token.substring(7) : token;
+			
+		if (token == null || token.isEmpty()) {
+			response.setStatus(HttpServletResponse.SC_FORBIDDEN); 
+			String jsonResponse = "{\"status\": \"error\", \"message\": \"Sem autorização\"}";
+			out.println(jsonResponse);
+			return; 			
+		}
+		
+		StringBuilder jsonReceived = new StringBuilder();
+	    String line;
+	    try (BufferedReader reader = request.getReader()) {
+	        while ((line = reader.readLine()) != null) {
+	            jsonReceived.append(line);
+	        }
+	    }
+	    Gson gson = new Gson();
+	    JsonObject jsonObject = gson.fromJson(jsonReceived.toString(), JsonObject.class);
+	    String locationId = jsonObject.get("id").getAsString();
 		if (location.deleteLocation(locationId)) {
 			String jsonResponse = "{\"status\": \"success\", \"message\": \"Operação bem-sucedida\"}";
 			out.println(jsonResponse);
@@ -180,6 +227,100 @@ public class RegisterLocation extends HttpServlet {
 			out.println(jsonResponse);
 		}
 	}
+	
+	protected void doPut(HttpServletRequest request, HttpServletResponse response)
+	        throws ServletException, IOException {
+		
+		response.setContentType("application/json;charset=UTF-8");
+	    PrintWriter out = response.getWriter();
+	    
+	    String token = request.getHeader("Authorization");
+	    token = token != null && token.startsWith("Bearer ") ? token.substring(7) : token;
+			
+		if (token == null || token.isEmpty()) {
+			response.setStatus(HttpServletResponse.SC_FORBIDDEN); 
+			String jsonResponse = "{\"status\": \"error\", \"message\": \"Sem autorização\"}";
+			out.println(jsonResponse);
+			return; 			
+		}
+	    Owner owner = udao.findOwnerByToken(token);
+
+	    if (owner == null) {
+	        out.println("{\"status\": \"error\", \"message\": \"Usuário não autenticado.\"}");
+	        return;
+	    }
+
+	    // 📌 Lendo o JSON recebido
+	    BufferedReader reader = request.getReader();
+	    StringBuilder jsonReceived = new StringBuilder();
+	    String line;
+	    while ((line = reader.readLine()) != null) {
+	        jsonReceived.append(line);
+	    }
+
+	    // 📌 Convertendo JSON para Objeto
+	    Gson gson = new Gson();
+	    JsonObject jsonObject = gson.fromJson(jsonReceived.toString(), JsonObject.class);
+
+	    // 📌 Pegando os dados do JSON
+	    String locationId = jsonObject.get("locationId").getAsString();
+	    String locationName = jsonObject.get("placeName").getAsString();
+	    String postalCode = jsonObject.get("cep").getAsString();
+	    String street = jsonObject.get("publicPlace").getAsString();
+	    String neighborhood = jsonObject.get("neighborhood").getAsString();
+	    String number = jsonObject.get("number").getAsString();
+	    String city = jsonObject.get("city").getAsString();
+	    String state = jsonObject.get("uf").getAsString();
+	    String establishmentType = jsonObject.get("establishmentType").getAsString();
+
+	    System.out.println("Atualizando local: " + locationId);
+
+	    boolean updated = false;
+
+	    if ("restaurant".equalsIgnoreCase(establishmentType)) {
+	        String cuisineType = jsonObject.get("typeOfCuisine").getAsString();
+	        String operatingDays = jsonObject.get("operatingDays").getAsString();
+
+	        Restaurant restaurant = new Restaurant(locationId, street, neighborhood, city, 0, 0, state, locationName, postalCode, number, cuisineType, operatingDays);
+	        updated = dao.updateRestaurant(restaurant);
+
+	    } else if ("event".equalsIgnoreCase(establishmentType)) {
+	        String startDateStr = jsonObject.get("startDate").getAsString();
+	        String endDateStr = jsonObject.get("endDate").getAsString();
+	        String eventPrice = jsonObject.get("eventPrice").getAsString();
+
+	        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+	        Date startDate = null, endDate = null;
+
+	        try {
+	            startDate = formatter.parse(startDateStr);
+	            endDate = formatter.parse(endDateStr);
+	        } catch (ParseException e) {
+	            e.printStackTrace();
+	            out.println("{\"status\": \"error\", \"message\": \"Formato de data inválido.\"}");
+	            return;
+	        }
+
+	        Event event = new Event(locationId, street, neighborhood, city, 0, 0, state, locationName, postalCode, number, startDate, endDate, eventPrice);
+	        updated = dao.updateEvent(event);
+
+	    } else if ("store".equalsIgnoreCase(establishmentType)) {
+	        String productType = jsonObject.get("typeProduct").getAsString();
+
+	        Store store = new Store(locationId, street, neighborhood, city, 0, 0, state, locationName, postalCode, number, productType);
+	        updated = dao.updateStore(store);
+	    } else {
+	        out.println("{\"status\": \"error\", \"message\": \"Tipo de estabelecimento inválido.\"}");
+	        return;
+	    }
+
+	    if (updated) {
+	        out.println("{\"status\": \"success\", \"message\": \"Local atualizado com sucesso.\"}");
+	    } else {
+	        out.println("{\"status\": \"error\", \"message\": \"Erro ao atualizar o local.\"}");
+	    }
+	}
+
 
 	private String buildJsonResponse(String status, String message, String locationsJson) {
 		String jsonResponse = "{" + "\"status\":\"" + status + "\"," + "\"message\":\"" + message + "\","

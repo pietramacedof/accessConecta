@@ -569,6 +569,7 @@ section.dark-mode .about-container h3 {
 	text-align: center;
 	border-width: 0;
 	font-size: 16px;
+	margin-top: 7px;
 }
 
 .button-register:hover {
@@ -768,11 +769,23 @@ section.dark-mode .about-container h3 {
 }
 
 .modal.dark-mode .modal-content-login .modal-login-info {
-	background-color: #181A1B
+	background-color: #181A1B;
 }
 
 .modal.dark-mode .modal-content-login .modal-login-info .input-group-text
 	{
+	background-color: #343541;
+}
+
+.modal.dark-mode .modal-container{
+	background-color: #181A1B;
+}
+
+.modal.dark-mode .modal-container .input-container .input-group-text{
+	background-color: #343541;
+}
+
+.modal.dark-mode .modal-container .input-container input{
 	background-color: #343541;
 }
 
@@ -1391,4 +1404,20 @@ input:checked+.slider:before {
 
 .fa-accessible-icon{
 	color: #4086F4;
+}
+
+section.dark-mode #image-carousel {
+	background-color: #202223;
+}
+
+section.dark-mode #image-carousel h4 {
+	color: white;
+}
+
+.location-info.dark-mode{
+	background-color: #181A1B;
+}
+
+.modal .modal-dialog.dark-mode{
+	background-color: #181A1B;
 }

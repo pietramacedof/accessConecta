@@ -54,7 +54,7 @@ public class Location {
 		return total;
 	}
 	
-	public Location evaluateLocation(String id, double note, User u) throws SQLException {
+	public Location evaluateLocation(String id, double note, Evaluator u) throws SQLException {
 		double convertedNote = (5*note)/16;
 		System.out.println(convertedNote);
 		LocationDAO dao = new LocationDAO();

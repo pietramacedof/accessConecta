@@ -1,9 +1,8 @@
-package model;
+package model.dao;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -14,12 +13,16 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 
+import model.Evaluator;
+import model.Owner;
+import model.User;
+
 public class UserDAO {
 
 	private String driver = "com.mysql.cj.jdbc.Driver";
 	private String JDBC_URL = "jdbc:mysql://localhost:3306/accessconecta";
 	private String user = "root";
-	private String password = "@PG3005d";
+	private String password = "";
 
 	private Connection toConnect() {
 		Connection con = null;
@@ -226,6 +229,33 @@ public class UserDAO {
 		}
 	}
 
+	public Evaluator findEvaluatorByToken(String token) {
+		 String sql = "SELECT * FROM user_info WHERE token = ?";
+	      try {
+	          Connection conn = toConnect();
+	          PreparedStatement pstmt = conn.prepareStatement(sql);
+	          pstmt.setString(1, token);
+
+	          ResultSet rs = pstmt.executeQuery();
+	          if (rs.next()) {
+	              String fName = rs.getString("f_name");
+	              String lName = rs.getString("l_name");
+	              String email = rs.getString("email");
+	              String password = rs.getString("watchword");
+	              String typeOfDisability = rs.getString("type_of_disability");
+	              Integer id = rs.getInt("id");
+
+	              Evaluator e = new Evaluator(fName, lName, email, password, typeOfDisability, id);
+	              e.setToken(token);
+	              return e;
+	          }
+	      } catch (SQLException e) {
+	          e.printStackTrace(); // Trate a exceção apropriadamente em um ambiente real
+	      }
+	      return null;
+	}
+	
+	
 	public void createEvaluator(Evaluator evaluator) {
 		String sql = "INSERT INTO user_info (f_Name, l_Name, email, watchword, type_of_disability, user_type) VALUES (?, ?, ?, ?, ?, ?)";
 		evaluator.setPassword(hashPassword(evaluator.getPassword()));

@@ -4,9 +4,26 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import model.dao.UserDAO;
+
 public class Owner extends User {
 	private Date dateOfBirth;
 	private List<Location> locations = new ArrayList<>();
+	
+	public void createOwner(Owner o) {
+		UserDAO dao = new UserDAO();
+		dao.createOwner(o); 
+	}
+	
+	public Owner findOwnerByToken (String token) {
+		UserDAO dao = new UserDAO();
+		return dao.findOwnerByToken(token);
+	}
+	
+	public Owner consultOwner (String username) {
+		UserDAO dao = new UserDAO();
+		return dao.consultOwner(username);
+	}
 
 	public Owner() {
 
@@ -28,11 +45,6 @@ public class Owner extends User {
 
 	public void setDateOfBirth(Date dateOfBirth) {
 		this.dateOfBirth = dateOfBirth;
-	}
-	
-	public Owner findOwnerByToken (String token) {
-		UserDAO dao = new UserDAO();
-		return dao.findOwnerByToken(token);
 	}
 	
 	

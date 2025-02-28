@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import model.Evaluation;
+import model.Evaluator;
 import model.Event;
 import model.Location;
 import model.Owner;
@@ -23,7 +24,7 @@ public class LocationDAO {
 	private String driver = "com.mysql.cj.jdbc.Driver";
 	private String JDBC_URL = "jdbc:mysql://localhost:3306/accessconecta";
 	private String user = "root";
-	private String password = "@PG3005d";
+	private String password = "";
 
 	private Connection toConnect() {
 		Connection con = null;
@@ -524,9 +525,9 @@ public class LocationDAO {
 		}
 	}
 	
-	public List<Evaluation> consultEvaluationByUser(User user) {
+	public List<Evaluation> consultEvaluationByUser(Evaluator user) {
         List<Evaluation> evaluations = new ArrayList<>();
-        User userResult = new User();
+        Evaluator userResult = new Evaluator();
         Location locationResult = new Location();
         try (Connection connection = toConnect()) {
             String sql = "SELECT evaluation_id, evaluation_rating, evaluation_location_id FROM evaluation WHERE evaluation_user_id = ?";

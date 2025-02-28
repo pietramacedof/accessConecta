@@ -8,13 +8,13 @@ import model.dao.LocationDAO;
 public class Evaluation {
 	private String id;
 	private double note;
-	private User user;
+	private Evaluator user;
 	private Location location;
 	public String getId() {
 		return id;
 	}
 	
-	public List<Evaluation> consultEvaluationByUser(User u){
+	public List<Evaluation> consultEvaluationByUser(Evaluator u){
 		LocationDAO d = new LocationDAO();
 		List<Evaluation> e = new ArrayList<>();
 		e = d.consultEvaluationByUser(u);
@@ -22,14 +22,14 @@ public class Evaluation {
 	}
 	
 	
-	public Evaluation(String id, double note, User user, Location location) {
+	public Evaluation(String id, double note, Evaluator user, Location location) {
 		this.id = id;
 		this.note = note;
 		this.user = user;
 		this.location = location;
 	}
 	
-	public Evaluation(double note, User user, Location location) {
+	public Evaluation(double note, Evaluator user, Location location) {
 		this.note = note;
 		this.user = user;
 		this.location = location;
@@ -53,7 +53,7 @@ public class Evaluation {
 	public User getUser() {
 		return user;
 	}
-	public void setUser(User user) {
+	public void setUser(Evaluator user) {
 		this.user = user;
 	}
 	public Location getLocation() {

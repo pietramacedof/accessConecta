@@ -1,13 +1,14 @@
 package controller;
 
 import jakarta.servlet.ServletException;
+
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import model.Owner;
 import model.User;
-import model.UserDAO;
+import model.dao.UserDAO;
 
 import java.io.IOException;
 import java.io.PrintWriter;

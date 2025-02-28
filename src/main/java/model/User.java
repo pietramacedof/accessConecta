@@ -1,8 +1,11 @@
 package model;
 
 import java.sql.SQLException;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import model.dao.UserDAO;
 
 public class User {
 
@@ -28,6 +31,12 @@ public class User {
 		else {
 			return false;
 		}
+	}
+	
+	public boolean hasEmail (String email) {
+		UserDAO dao = new UserDAO();
+		boolean has = dao.hasEmail(email) ? true : false;
+		return has;
 	}
 
 	public User() {

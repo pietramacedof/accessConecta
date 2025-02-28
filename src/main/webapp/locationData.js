@@ -409,7 +409,7 @@ $('#confirmToAlterPassword').on('click', function () {
 document.getElementById('registerLocation').addEventListener('submit', function (event) {
 	event.preventDefault();
 	//checar campos vazios, sessão
-
+	
 	var locationName = document.getElementById('nameLocation').value;
 	var postalCode = document.getElementById('cep-input').value;
 	var street = document.getElementById('logradouro').value;
@@ -558,16 +558,17 @@ document.getElementById('registerLocation').addEventListener('submit', function 
 				localStorage.setItem('dataLocation', JSON.stringify(storedData));
 			}
 
-			renderLocations(data, address, data.id);
+			if(localStorage.getItem('hasLocation') == 'false'){
+				location.reload();
+			}
+			
 
 			localStorage.setItem('hasLocation', true);
 
 
-
-
 			$('#registerLocationModal').hide();
-			$('#noLocationInfo').hide();
 			$('#hasLocation').show();
+			renderLocations(data, address, data.id);
 		})
 		.catch((error) => {
 			console.error(error);
@@ -914,6 +915,7 @@ function handleSections(array) {
 		$('#hasLocationSection').show();
 		return;
 	}
+	localStorage.setItem('hasLocation', false);
 	$('#noLocationInfo').show();
 	$('#hasLocationSection').hide();
 }
@@ -1017,13 +1019,6 @@ function initMap(address, mapContainerId) {
 				zoomControl: false,
 				draggable: false,
 			});
-
-			// map.addListener('tilesloaded', function() {
-			// 	const mapElements = document.querySelectorAll(`#${mapContainerId} .gm-style-cc`);
-			// 	mapElements.forEach(function(element) {
-			// 		element.style.display = 'none';
-			// 	});
-			// });
 
 			const marker = new google.maps.Marker({
 				position: locationLatLng,

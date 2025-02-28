@@ -8,6 +8,7 @@ public class Event extends Location{
 	private Date startDate;
 	private Date endDate;
 	private String eventPrice;
+	
 	public Date getStartDate() {
 		return startDate;
 	}

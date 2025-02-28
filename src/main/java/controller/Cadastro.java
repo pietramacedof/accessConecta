@@ -1,21 +1,21 @@
 package controller;
 
+import java.io.IOException;
+
+import java.io.PrintWriter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import jakarta.servlet.ServletException;
-
-
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import model.Evaluator;
 import model.Owner;
-import model.UserDAO;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import model.User;
+import model.dao.UserDAO;
 
 /**
  * Servlet implementation class Cadastro
@@ -54,19 +54,19 @@ public class Cadastro extends HttpServlet {
 		String lastName = request.getParameter("lastName");
 		String email = request.getParameter("email");
 		String password = request.getParameter("password");
+		User u = new User(firstName, lastName, email, password);
 		String userType = request.getParameter("userType");
 		System.out.println("Página acessada." + firstName);
 		response.setContentType("application/json;charset=UTF-8");
 		PrintWriter out = response.getWriter();
 		
-		if (dao.hasEmail(email)) {
+		if (u.hasEmail(u.getEmail())) {
 			String jsonResponse = "{\"status\": \"error\", \"message\": \"O e-mail informado já está cadastrado.\"}";
 			out.println(jsonResponse);
 			System.out.println("Email já existe.");
 			return;
 		}
 			if ("owner".equals(userType)) {
-
 				String dateOfBirthString = request.getParameter("dateOfBirth");
 				System.out.println("Usuário do tipo owner: " + password);
 				Date dateOfBirth = null;
@@ -78,7 +78,7 @@ public class Cadastro extends HttpServlet {
 					dateOfBirth = new java.sql.Date(utilDate.getTime());
 					System.out.println("Usuário do tipo owner: " + dateOfBirthString);
 					Owner owner = new Owner(firstName, lastName, email, password, dateOfBirth);
-					dao.createOwner(owner);
+					owner.createOwner(owner);
 					String jsonResponse = "{\"status\": \"success\", \"message\": \"Operação bem-sucedida\"}";
 					out.println(jsonResponse);
 
@@ -90,7 +90,7 @@ public class Cadastro extends HttpServlet {
 				String typeOfDisability = request.getParameter("typeOfDisability");
 				System.out.println("Usuário do tipo evaluator com tipo de deficiência: " + typeOfDisability);
 				Evaluator evaluator = new Evaluator(firstName, lastName, email, password, typeOfDisability);
-				dao.createEvaluator(evaluator);
+				evaluator.createEvaluator(evaluator);
 				String jsonResponse = "{\"status\": \"success\", \"message\": \"Operação bem-sucedida\"}";
 				out.println(jsonResponse);
 			}
